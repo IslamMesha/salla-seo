@@ -6,4 +6,5 @@ app_name = 'app'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
 ]
