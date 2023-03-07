@@ -5,6 +5,7 @@ from django.contrib import messages
 
 from app.controllers import SallaOAuth
 from app.exceptions import SallaOauthFailedException
+from app.models import Account
 
 
 def index(request):
@@ -19,8 +20,8 @@ def oauth_callback(request):
     code = request.GET.get('code')
     if code:
         messages.success(request, 'Login Success.')
-        access_token = SallaOAuth().get_access_token(code)
-        print(access_token)
+        data = SallaOAuth().get_access_token(code)
+        Account.store(data)
     else:
         raise SallaOauthFailedException()
 
