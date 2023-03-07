@@ -65,6 +65,8 @@ class SallaOAuth:
 class SallaEndpoint:
     def __init__(self, account) -> None:
         # TODO account is database record that contain oauth data
+        # TODO handel rate limit
+        # TODO handel multilingual support
 
         self.access_token = account.get('access_token')
         self.refresh_token = account.get('refresh_token')
