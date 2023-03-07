@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from app.controllers import SallaOAuth
+from app.exceptions import SallaOauthFailedException
 
 
 def index(request):
@@ -13,6 +14,7 @@ def index(request):
     }
     return render(request, 'index.html', context=context)
 
+
 def oauth_callback(request):
     code = request.GET.get('code')
     if code:
@@ -20,7 +22,7 @@ def oauth_callback(request):
         access_token = SallaOAuth().get_access_token(code)
         print(access_token)
     else:
-        messages.error(request, 'Login Failed.')
+        raise SallaOauthFailedException()
 
     return redirect('app:index')
 
