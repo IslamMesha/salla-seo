@@ -62,3 +62,30 @@ class SallaOAuth:
         return response.json()
 
 
+class SallaEndpoint:
+    def __init__(self, account) -> None:
+        # TODO account is database record that contain oauth data
+
+        self.access_token = account.get('access_token')
+        self.refresh_token = account.get('refresh_token')
+
+        self.base_url = 'https://accounts.salla.sa/oauth2'
+        self.rate_limit = 0
+
+    def __get_headers(self) -> dict:
+        return {
+            'Authorization': f'Bearer {self.access_token}',
+        }
+
+    def get_user(self):
+        url = f'{self.base_url}/user/info'
+        headers = self.__get_headers()
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 200:
+            raise SallaOauthFailedException()
+
+        return response.json()
+        
+
