@@ -28,6 +28,7 @@ class TokenAuthSupportCookie(TokenAuthentication):
         is_auth_by_header = 'HTTP_AUTHORIZATION' in request.META
         is_auth_by_cookie = 'auth_token' in request.COOKIES
 
+        result = None
         if is_auth_by_header:
             result = super().authenticate(request)
         if is_auth_by_cookie:
