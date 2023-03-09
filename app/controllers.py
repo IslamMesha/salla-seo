@@ -88,6 +88,6 @@ class SallaEndpoint:
         if response.status_code != 200:
             raise SallaOauthFailedException()
 
-        return response.json()
+        return response.json()['data']
         
 
