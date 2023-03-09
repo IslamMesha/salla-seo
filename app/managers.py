@@ -5,7 +5,7 @@ class AccountManager(Manager):
         obj = super().get(*args, **kwargs)
 
         if not obj.is_alive:
-            obj.refresh_token()
+            obj.refresh_access_token()
 
         return obj
 
