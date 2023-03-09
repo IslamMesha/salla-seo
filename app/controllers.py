@@ -62,7 +62,9 @@ class SallaOAuth:
         return response.json()
 
 
-class SallaEndpoint:
+class SallaReader:
+    """Class to read data from salla api"""
+
     def __init__(self, account) -> None:
         # TODO account is database record that contain oauth data
         # TODO handel rate limit
