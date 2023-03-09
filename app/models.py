@@ -17,7 +17,7 @@ class Account(models.Model):
     )
     is_active = models.BooleanField(default=True)
     user = models.OneToOneField(
-        User, related_name=CookieKeys.AUTH_TOKEN, on_delete=models.CASCADE,
+        User, related_name='auth_token', on_delete=models.CASCADE,
         blank=True, null=True
     )
 
