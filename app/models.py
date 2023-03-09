@@ -58,7 +58,8 @@ class Account(models.Model):
         else:
             instance = cls(**data)
 
-        return instance.save()
+        instance.save()
+        return instance
 
     @property
     def is_alive(self):
