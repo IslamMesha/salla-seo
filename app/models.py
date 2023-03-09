@@ -1,10 +1,11 @@
 import time
 
 from django.db import models
+from django.contrib.auth.models import User
 
 from app import utils
 from app import managers
-from app.controllers import SallaOAuth 
+from app.controllers import SallaOAuth
 
 
 class Account(models.Model):
@@ -12,6 +13,11 @@ class Account(models.Model):
     public_token = models.CharField(
         max_length=256, unique=True, editable=False, 
         db_index=True, default=utils.generate_token
+    )
+    is_active = models.BooleanField(default=True)
+    user = models.OneToOneField(
+        User, related_name='auth_token', on_delete=models.CASCADE,
+        blank=True, null=True
     )
 
     # Comes from Salla
@@ -31,6 +37,12 @@ class Account(models.Model):
     def save(self, *args, **kwargs):
         if self.token_type:
             self.token_type = self.token_type.title()
+
+        # user so authentication works properly 
+        if self.user is None:
+            self.user = User.objects.create_user(
+                username=utils.generate_random_username(),
+            )
 
         return super().save(*args, **kwargs)
 
@@ -52,10 +64,11 @@ class Account(models.Model):
     def is_alive(self):
         return self.expires_in > int(time.time())
 
-    def refresh_token(self):
+    def refresh_access_token(self):
         data = SallaOAuth().refresh_access_token(self.refresh_token)
         self.store(data, self)
 
         return True
 
-
+    def __str__(self):
+        return self.public_token
