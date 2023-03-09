@@ -10,6 +10,7 @@ from app.controllers import SallaOAuth
 from app.exceptions import SallaOauthFailedException
 from app.models import Account
 from app.utils import set_cookie
+from app.enums import CookieKeys
 
 
 def index(request):
@@ -17,7 +18,7 @@ def index(request):
     context = {
         'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
     }
-    print(Account.objects.filter(public_token=request.COOKIES.get('auth_token')))
+    print(Account.objects.filter(public_token=request.COOKIES.get(CookieKeys.AUTH_TOKEN)))
     return render(request, 'index.html', context=context)
 
 
@@ -29,7 +30,7 @@ def oauth_callback(request):
         account = Account.store(data)
         response = redirect('app:index')
         
-        set_cookie(response, 'auth_token', account.public_token, max_age=60 * 60 * 24 * 14)
+        set_cookie(response, CookieKeys.AUTH_TOKEN, account.public_token, max_age=60 * 60 * 24 * 14)
     else:
         raise SallaOauthFailedException()
 

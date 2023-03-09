@@ -4,6 +4,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import exceptions
 
 from app.models import Account
+from app.enums import CookieKeys
 
 
 class TokenAuthSupportCookie(TokenAuthentication):
@@ -26,13 +27,13 @@ class TokenAuthSupportCookie(TokenAuthentication):
 
     def authenticate(self, request):
         is_auth_by_header = 'HTTP_AUTHORIZATION' in request.META
-        is_auth_by_cookie = 'auth_token' in request.COOKIES
+        is_auth_by_cookie = CookieKeys.AUTH_TOKEN in request.COOKIES
 
         result = None
         if is_auth_by_header:
             result = super().authenticate(request)
         if is_auth_by_cookie:
-            token = request.COOKIES.get('auth_token')
+            token = request.COOKIES.get(CookieKeys.AUTH_TOKEN)
             result = self.authenticate_credentials(token)
 
         return result
