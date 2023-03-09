@@ -13,3 +13,6 @@ def generate_random_username():
     length = random.randint(5, 16)
     return ''.join(random.choices(space, k=length))
 
+def set_cookie(response, key, value, max_age=None):
+    response.set_cookie(key, value, max_age=max_age, httponly=True, samesite='Strict')
+
