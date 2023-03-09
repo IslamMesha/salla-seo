@@ -6,5 +6,10 @@ def next_two_weeks():
 
 def generate_token(length=64):
     space = string.ascii_letters + string.digits
-    return random.choices(space, k=length)
+    return ''.join(random.choices(space, k=length))
+
+def generate_random_username():
+    space = string.ascii_lowercase
+    length = random.randint(5, 16)
+    return ''.join(random.choices(space, k=length))
 
