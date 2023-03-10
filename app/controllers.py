@@ -1,7 +1,11 @@
 import os
 import requests
 
+from rest_framework.serializers import Serializer
+
 from app.exceptions import SallaOauthFailedException
+from app import models
+from app.serializers import ProductEndpointParamsSerializer
 
 
 class SallaOAuth:
@@ -26,7 +30,7 @@ class SallaOAuth:
             'Content-Type': 'application/x-www-form-urlencoded',
         }
 
-    def get_access_token(self, code) -> dict:
+    def get_access_token(self, code: str) -> dict:
         url = 'https://accounts.salla.sa/oauth2/token'
         body = self.__get_body()
         headers = self.__get_headers()
@@ -44,7 +48,7 @@ class SallaOAuth:
 
         return response.json()
 
-    def refresh_access_token(self, refresh_token):
+    def refresh_access_token(self, refresh_token: str) -> dict:
         url = 'https://accounts.salla.sa/oauth2/token'
         body = self.__get_body()
         headers = self.__get_headers()
@@ -62,34 +66,74 @@ class SallaOAuth:
         return response.json()
 
 
-class SallaReader:
-    """Class to read data from salla api"""
+class SallaBaseReader:
+    """Base class for Salla API readers
+    because there there are endpoints 
+    read about merchant
+    others read about settings
+    """
+    def __init__(self, account: models.Account) -> None:
+        self.access_token = account.access_token
+        self.base_url = os.getenv('SALLA_BASE_URL')
 
-    def __init__(self, account) -> None:
-        # TODO account is database record that contain oauth data
-        # TODO handel rate limit
-        # TODO handel multilingual support
+    def get_headers(self) -> dict:
+        return { 'Authorization': f'Bearer {self.access_token}' }
 
-        self.access_token = account.get('access_token')
-        self.refresh_token = account.get('refresh_token')
+    def get_params(self, serializer: Serializer, params: dict) -> dict:
+        """validate and return params"""
+        if params is None:
+            return 
 
-        self.base_url = 'https://accounts.salla.sa/oauth2'
-        self.rate_limit = 0
+        params = serializer(data=params)
+        params.is_valid(raise_exception=True)
+        params = params.data
 
-    def __get_headers(self) -> dict:
-        return {
-            'Authorization': f'Bearer {self.access_token}',
-        }
+        return params
 
-    def get_user(self):
-        url = f'{self.base_url}/user/info'
+    def get(self, endpoint: str, params: dict = None) -> dict:
+        """send get request to api, handle errors and return data"""
+
         headers = self.__get_headers()
-
-        response = requests.get(url, headers=headers)
+        url = f'{self.base_url}{endpoint}'
+        response = requests.get(url, headers=headers, params=params)
 
         if response.status_code != 200:
             raise SallaOauthFailedException()
 
         return response.json()['data']
-        
+
+
+class SallaMerchantReader(SallaBaseReader):
+    """Class to read data from salla merchant api"""
+    def get_user(self) -> dict:
+        endpoint = '/oauth2/user/info'
+        return self.get(endpoint)
+
+    def get_store(self) -> dict:
+        endpoint = '/store/info'
+        return self.get(endpoint)
+
+    def get_products(self, params: dict = None) -> dict:
+        endpoint = '/products'
+        params = self.get_params(ProductEndpointParamsSerializer, params)
+
+        return self.get(endpoint, params)
+
+
+class SallaAppSettingsReader(SallaBaseReader):
+    APP_ID = os.getenv('SALLA_APP_ID')
+
+    def get_subscription(self) -> dict:
+        """get the subscription plan that user chose"""
+
+        endpoint = f'/apps/{self.APP_ID}/subscriptions'
+        return self.get(endpoint)
+
+    def get_settings(self) -> dict:
+        """get the custom settings, user filled in forms that
+        created earlier in salla dashboard"""
+
+        endpoint = f'/apps/{self.APP_ID}/settings'
+        return self.get(endpoint)
+
 
