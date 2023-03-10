@@ -18,7 +18,7 @@ def index(request):
     context = {
         'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
     }
-    print(Account.objects.filter(public_token=request.COOKIES.get(CookieKeys.AUTH_TOKEN)))
+    print(Account.objects.filter(public_token=request.COOKIES.get(CookieKeys.AUTH_TOKEN.value)))
     return render(request, 'index.html', context=context)
 
 
@@ -31,7 +31,7 @@ def oauth_callback(request):
         response = redirect('app:index')
         
         month = 60 * 60 * 24 * 30
-        set_cookie(response, CookieKeys.AUTH_TOKEN, account.public_token, max_age=month)
+        set_cookie(response, CookieKeys.AUTH_TOKEN.value, account.public_token, max_age=month)
     else:
         raise SallaOauthFailedException()
 

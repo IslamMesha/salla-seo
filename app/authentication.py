@@ -27,13 +27,13 @@ class TokenAuthSupportCookie(TokenAuthentication):
 
     def authenticate(self, request):
         is_auth_by_header = 'HTTP_AUTHORIZATION' in request.META
-        is_auth_by_cookie = CookieKeys.AUTH_TOKEN in request.COOKIES
+        is_auth_by_cookie = CookieKeys.AUTH_TOKEN.value in request.COOKIES
 
         result = None
         if is_auth_by_header:
             result = super().authenticate(request)
         if is_auth_by_cookie:
-            token = request.COOKIES.get(CookieKeys.AUTH_TOKEN)
+            token = request.COOKIES.get(CookieKeys.AUTH_TOKEN.value)
             result = self.authenticate_credentials(token)
 
         return result
