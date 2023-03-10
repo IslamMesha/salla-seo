@@ -4,7 +4,7 @@ import requests
 from rest_framework.serializers import Serializer
 
 from app.exceptions import SallaOauthFailedException
-from app import models
+from app.models import Account
 from app.serializers import ProductEndpointParamsSerializer
 
 
@@ -72,7 +72,7 @@ class SallaBaseReader:
     read about merchant
     others read about settings
     """
-    def __init__(self, account: models.Account) -> None:
+    def __init__(self, account: Account) -> None:
         self.access_token = account.access_token
         self.base_url = os.getenv('SALLA_BASE_URL')
 
