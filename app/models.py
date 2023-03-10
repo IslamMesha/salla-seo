@@ -1,12 +1,40 @@
 import time
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser
 
 from app import utils
 from app import managers
-from app.controllers import SallaOAuth
-from app.enums import CookieKeys
+
+
+class SallaUser(AbstractBaseUser):
+    salla_id = models.CharField(max_length=64, unique=True, db_index=True)
+
+    name = models.CharField(max_length=128, blank=True, null=True)
+    email = models.EmailField(max_length=256, blank=True, null=True)
+    mobile = models.CharField(max_length=32, blank=True, null=True)
+    role = models.CharField(max_length=16, default='user')
+
+    is_active = models.BooleanField(default=True)
+    is_merchant = models.BooleanField(default=False)
+
+    merchant = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    USERNAME_FIELD = 'salla_id'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.salla_id
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.is_merchant = self.salla_id == self.merchant.get('id')
+
+        return super().save(*args, **kwargs)
 
 
 class Account(models.Model):
@@ -15,9 +43,9 @@ class Account(models.Model):
         max_length=256, unique=True, editable=False, 
         db_index=True, default=utils.generate_token
     )
-    is_active = models.BooleanField(default=True)
     user = models.OneToOneField(
-        User, related_name='auth_token', on_delete=models.CASCADE,
+        'app.SallaUser', on_delete=models.CASCADE, related_name='token',
+        # because account is created before user
         blank=True, null=True
     )
 
@@ -41,9 +69,7 @@ class Account(models.Model):
 
         # user so authentication works properly 
         if self.user is None:
-            self.user = User.objects.create_user(
-                username=utils.generate_random_username(),
-            )
+            self.user = SallaUser.objects.create(salla_id=utils.generate_token(12))
 
         return super().save(*args, **kwargs)
 
@@ -68,6 +94,8 @@ class Account(models.Model):
         return self.expires_in > int(time.time())
 
     def refresh_access_token(self):
+        from app.controllers import SallaOAuth
+
         data = SallaOAuth().refresh_access_token(self.refresh_token)
         self.store(data, self)
 
@@ -75,3 +103,4 @@ class Account(models.Model):
 
     def __str__(self):
         return self.public_token
+
