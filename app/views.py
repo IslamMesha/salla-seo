@@ -30,7 +30,8 @@ def oauth_callback(request):
         account = Account.store(data)
         response = redirect('app:index')
         
-        set_cookie(response, CookieKeys.AUTH_TOKEN, account.public_token, max_age=60 * 60 * 24 * 14)
+        month = 60 * 60 * 24 * 30
+        set_cookie(response, CookieKeys.AUTH_TOKEN, account.public_token, max_age=month)
     else:
         raise SallaOauthFailedException()
 
