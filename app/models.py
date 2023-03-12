@@ -63,13 +63,26 @@ class Account(models.Model):
     # before get the account check if it's alive
     objects = managers.AccountManager()
 
+    def __pull_user(self) -> SallaUser:
+        from .controllers import SallaMerchantReader
+        from .serializers import SallaUserSerializer
+
+        user_data = SallaMerchantReader(self).get_user()
+        user_data['salla_id'] = user_data.pop('id')
+
+        user = SallaUserSerializer(data=user_data)
+        user.is_valid(raise_exception=True)
+        user = user.save()
+
+        return user
+
     def save(self, *args, **kwargs):
         if self.token_type:
             self.token_type = self.token_type.title()
 
         # user so authentication works properly 
         if self.user is None:
-            self.user = SallaUser.objects.create(salla_id=utils.generate_token(12))
+            self.user = self.__pull_user()
 
         return super().save(*args, **kwargs)
 
