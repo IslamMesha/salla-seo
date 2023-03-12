@@ -93,7 +93,7 @@ class SallaBaseReader:
     def get(self, endpoint: str, params: dict = None) -> dict:
         """send get request to api, handle errors and return data"""
 
-        headers = self.__get_headers()
+        headers = self.get_headers()
         url = f'{self.base_url}{endpoint}'
         response = requests.get(url, headers=headers, params=params)
 
