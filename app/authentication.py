@@ -20,7 +20,7 @@ class TokenAuthSupportCookie(TokenAuthentication):
         except model.DoesNotExist:
             raise exceptions.AuthenticationFailed(_('Invalid token.'))
 
-        if not token.is_active:
+        if not token.user.is_active:
             raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
 
         return (token.user, token)
