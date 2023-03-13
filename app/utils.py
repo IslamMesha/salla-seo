@@ -16,3 +16,10 @@ def generate_random_username():
 def set_cookie(response, key, value, max_age=None):
     response.set_cookie(key, value, max_age=max_age, httponly=True, samesite='Strict')
 
+def create_by_serializer(Serializer, data):
+    s = Serializer(data=data)
+    s.is_valid(raise_exception=True)
+    instance = s.save()
+
+    return instance
+
