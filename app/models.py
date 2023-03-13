@@ -44,7 +44,7 @@ class Account(models.Model):
         db_index=True, default=utils.generate_token
     )
     user = models.OneToOneField(
-        'app.SallaUser', on_delete=models.CASCADE, related_name='token',
+        'app.SallaUser', on_delete=models.CASCADE, related_name='account',
         # because account is created before user
         blank=True, null=True
     )
@@ -70,11 +70,7 @@ class Account(models.Model):
         user_data = SallaMerchantReader(self).get_user()
         user_data['salla_id'] = user_data.pop('id')
 
-        user = SallaUserSerializer(data=user_data)
-        user.is_valid(raise_exception=True)
-        user = user.save()
-
-        return user
+        return utils.create_by_serializer(SallaUserSerializer, user_data)
 
     def save(self, *args, **kwargs):
         if self.token_type:
@@ -117,3 +113,26 @@ class Account(models.Model):
     def __str__(self):
         return self.public_token
 
+
+class SallaStore(models.Model):
+    user = models.OneToOneField(
+        SallaUser, on_delete=models.CASCADE, related_name='store'
+    )
+        
+    salla_id = models.CharField(max_length=64, unique=True)
+
+    name = models.CharField(max_length=128, blank=True, null=True)
+    email = models.EmailField(max_length=256, blank=True, null=True)
+    avatar = models.URLField(max_length=512, blank=True, null=True)
+    plan = models.CharField(max_length=32, blank=True, null=True)
+    status = models.CharField(max_length=32, blank=True, null=True)
+    verified = models.BooleanField(default=True)
+    currency = models.CharField(max_length=16, blank=True, null=True)
+    domain = models.URLField(max_length=512, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    licenses = models.JSONField(default=dict)
+    social = models.JSONField(default=dict)
+
+    # Times
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
