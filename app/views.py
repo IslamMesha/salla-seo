@@ -4,9 +4,10 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from app.controllers import SallaOAuth
+from app.controllers import SallaOAuth, SallaMerchantReader
 from app.exceptions import SallaOauthFailedException
 from app.models import Account
 from app.utils import set_cookie
@@ -18,7 +19,9 @@ def index(request):
     context = {
         'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
     }
-    print(Account.objects.filter(public_token=request.COOKIES.get(CookieKeys.AUTH_TOKEN.value)))
+    print(
+        Account.objects.filter(public_token=request.COOKIES.get(CookieKeys.AUTH_TOKEN.value))
+    )
     return render(request, 'index.html', context=context)
 
 
@@ -40,4 +43,14 @@ def oauth_callback(request):
 class Test(APIView):
     def get(self, request):
         return Response({'message': 'Hello World!'})
+
+class ProductsListAPI(ListAPIView):
+    def get(self, request):
+        params = request.GET
+
+        token = request.COOKIES.get(CookieKeys.AUTH_TOKEN.value)
+        account = Account.objects.filter(public_token=token).first()
+        products = SallaMerchantReader(account).get_products(params)
+
+        return Response({'data': products})
 
