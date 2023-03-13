@@ -3,9 +3,10 @@ import requests
 
 from rest_framework.serializers import Serializer
 
-from app.exceptions import SallaOauthFailedException
+from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
 from app.models import Account
 from app.serializers import ProductEndpointParamsSerializer
+from app import utils
 
 
 class SallaOAuth:
@@ -84,11 +85,7 @@ class SallaBaseReader:
         if params is None:
             return 
 
-        params = serializer(data=params)
-        params.is_valid(raise_exception=True)
-        params = params.data
-
-        return params
+        return utils.serialize_data_recursively(serializer, params, default={})
 
     def get(self, endpoint: str, params: dict = None) -> dict:
         """send get request to api, handle errors and return data"""
@@ -98,7 +95,8 @@ class SallaBaseReader:
         response = requests.get(url, headers=headers, params=params)
 
         if response.status_code != 200:
-            raise SallaOauthFailedException()
+            print(f'\n\nError: {response.status_code} {response.text}, \n\n')
+            raise SallaEndpointFailureException()
 
         return response.json()['data']
 
