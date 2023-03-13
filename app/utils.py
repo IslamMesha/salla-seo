@@ -23,3 +23,16 @@ def create_by_serializer(Serializer, data):
 
     return instance
 
+def serialize_data_recursively(Serializer, data:dict, default:dict=None):
+    """If not serializable, return serialized version of the default value"""
+    s = Serializer(data=data)
+
+    if s.is_valid():
+        data = s.data
+    elif default is not None:
+        data = serialize_data_recursively(Serializer, default)
+    else:
+        data = default # which is None
+
+    return data
+
