@@ -6,22 +6,25 @@ from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.decorators import authentication_classes
 
 from app.controllers import SallaOAuth, SallaMerchantReader
 from app.exceptions import SallaOauthFailedException
 from app.models import Account
 from app.utils import set_cookie
 from app.enums import CookieKeys
+from app.authentication import TokenAuthSupportCookie
 
 
+@authentication_classes([TokenAuthSupportCookie])
 def index(request):
     app_id = os.environ.get('SALLA_APP_ID')
     context = {
         'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
+        'user': request.user,
     }
-    print(
-        Account.objects.filter(public_token=request.COOKIES.get(CookieKeys.AUTH_TOKEN.value))
-    )
+    
+    print(request.user.is_authenticated and request.user.account)
     return render(request, 'index.html', context=context)
 
 
@@ -48,9 +51,8 @@ class ProductsListAPI(ListAPIView):
     def get(self, request):
         params = request.GET
 
-        token = request.COOKIES.get(CookieKeys.AUTH_TOKEN.value)
-        account = Account.objects.filter(public_token=token).first()
+        account = request.user.account
         products = SallaMerchantReader(account).get_products(params)
 
-        return Response({'data': products})
+        return Response(products)
 
