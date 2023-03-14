@@ -32,6 +32,6 @@ class ProductEndpointParamsSerializer(serializers.Serializer):
     category = serializers.CharField(required=False, max_length=100)
     keyword = serializers.CharField(required=False, max_length=100)
     page = serializers.IntegerField(required=False, default=1)
-    per_page = serializers.IntegerField(required=False, default=100)
+    per_page = serializers.IntegerField(required=False, default=10)
     status = serializers.ChoiceField(required=False, choices=STATUS_CHOICES)
 
