@@ -87,6 +87,14 @@ class SallaBaseReader:
 
         return utils.serialize_data_recursively(serializer, params, default={})
 
+    def __get_response_data(self, response: dict) -> dict:
+        """get data from response"""
+        return (
+            response 
+            if type(response.get('data')) is list 
+            else response['data']
+        )
+
     def get(self, endpoint: str, params: dict = None) -> dict:
         """send get request to api, handle errors and return data"""
 
@@ -98,7 +106,7 @@ class SallaBaseReader:
             print(f'\n\nError: {response.status_code} {response.text}, \n\n')
             raise SallaEndpointFailureException()
 
-        return response.json()['data']
+        return self.__get_response_data(response.json())
 
 
 class SallaMerchantReader(SallaBaseReader):
