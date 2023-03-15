@@ -1,5 +1,6 @@
 import os
 import requests
+import openai
 
 from rest_framework.serializers import Serializer
 
@@ -141,5 +142,26 @@ class SallaAppSettingsReader(SallaBaseReader):
 
         endpoint = f'/apps/{self.APP_ID}/settings'
         return self.get(endpoint)
+
+
+class ChatGPT:
+    openai.api_key = os.getenv('OPENAI_API_KEY')
+
+    def ask(self, prompt: str):
+        openai_model = os.getenv('OPENAI_MODEL', 'text-davinci-003')
+        openai_max_token = int(os.getenv('OPENAI_MAX_TOKEN', 256))
+
+        response = openai.Completion.create(
+            model=openai_model,
+            prompt=prompt,
+            temperature=0,
+            max_tokens=openai_max_token,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        return response.to_dict_recursive()
+
 
 
