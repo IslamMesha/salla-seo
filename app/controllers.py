@@ -1,12 +1,11 @@
 import os
 import requests
-import openai
 
 from rest_framework.serializers import Serializer
 
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
-from app.models import Account
-from app.serializers import ProductEndpointParamsSerializer
+from app.models import Account, ChatGPTLog
+from app.serializers import ProductEndpointParamsSerializer, ChatGPTResponseSerializer
 from app import utils
 
 
@@ -145,13 +144,25 @@ class SallaAppSettingsReader(SallaBaseReader):
 
 
 class ChatGPT:
-    openai.api_key = os.getenv('OPENAI_API_KEY')
+    def __init__(self) -> None:
+        import openai
+        openai.api_key = os.getenv('OPENAI_API_KEY')
 
-    def ask(self, prompt: str):
+        self.openai = openai
+
+    def __log_to_db(self, prompt: str, response: dict) -> ChatGPTLog:
+        response.update({'prompt': prompt})
+
+        serializer = ChatGPTResponseSerializer(data=response)
+        serializer.is_valid(raise_exception=True)
+
+        return serializer.save()
+
+    def ask(self, prompt: str) -> ChatGPTLog:
         openai_model = os.getenv('OPENAI_MODEL', 'text-davinci-003')
         openai_max_token = int(os.getenv('OPENAI_MAX_TOKEN', 256))
 
-        response = openai.Completion.create(
+        response = self.openai.Completion.create(
             model=openai_model,
             prompt=prompt,
             temperature=0,
@@ -159,9 +170,10 @@ class ChatGPT:
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0
-        )
-
-        return response.to_dict_recursive()
+        ).to_dict_recursive()
+        
+        instance = self.__log_to_db(prompt, response)
+        return instance
 
 
 
