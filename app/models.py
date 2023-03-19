@@ -128,3 +128,16 @@ class SallaStore(models.Model):
         return self.salla_id
 
 
+class ChatGPTLog(models.Model):
+    prompt = models.CharField(max_length=512)
+    total_tokens = models.PositiveSmallIntegerField(default=0)
+    answer = models.TextField()
+
+    full_response = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.prompt
+
