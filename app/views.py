@@ -9,12 +9,13 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.decorators import authentication_classes
 
-from app.controllers import SallaOAuth, SallaMerchantReader
+from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator
 from app.exceptions import SallaOauthFailedException
-from app.models import Account
+from app.models import Account, UserPrompt
 from app.utils import set_cookie
 from app.enums import CookieKeys
 from app.authentication import TokenAuthSupportCookie
+from app.serializers import ProductGetDescriptionPOSTBodySerializer
 
 
 def get_products() -> list:
@@ -51,6 +52,7 @@ def oauth_callback(request):
 
     return response
 
+
 class Test(APIView):
     def get(self, request):
         return Response({'message': 'Hello World!'})
@@ -63,4 +65,30 @@ class ProductsListAPI(ListAPIView):
         products = SallaMerchantReader(account).get_products(params)
 
         return Response(products)
+
+
+class ProductGetDescriptionAPI(APIView):
+    post_body_serializer = ProductGetDescriptionPOSTBodySerializer
+    
+    def get_data(self, request):
+        serializer = self.post_body_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.data
+
+    def post(self, request):
+        # TODO check if product description got already ot not
+        # before all the operations
+
+        data = self.get_data(request)
+
+        prompt = ChatGPTProductPromptGenerator(data)
+        chat_gpt = ChatGPT().ask(
+            prompt.ask_for_description()
+        )
+
+        UserPrompt.objects.create(
+            user=request.user, chat_gpt_log=chat_gpt, meta=data,
+        )
+
+        return  Response({'description': chat_gpt.answer})
 

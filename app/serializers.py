@@ -56,3 +56,9 @@ class ChatGPTResponseSerializer(serializers.Serializer):
     def save(self, **kwargs):
         return models.ChatGPTLog.objects.create(**self.data)
 
+
+class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
+    # Those will be used as labels in the chatgpt templates
+    product_id = serializers.CharField(required=True, max_length=128)
+    product_name = serializers.CharField(required=True, max_length=128)
+
