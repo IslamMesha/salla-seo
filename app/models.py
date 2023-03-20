@@ -141,3 +141,21 @@ class ChatGPTLog(models.Model):
     def __str__(self):
         return self.prompt
 
+
+class UserPrompt(models.Model):
+    user = models.ForeignKey(
+        SallaUser, on_delete=models.CASCADE, related_name='prompts'
+    )
+    chat_gpt_log = models.OneToOneField(
+        'app.ChatGPTLog', on_delete=models.CASCADE, related_name='user_prompt'
+    )
+    # it may contain data about the product user asked about
+    meta = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.user }: {self.chat_gpt_log.prompt}'
+
+
