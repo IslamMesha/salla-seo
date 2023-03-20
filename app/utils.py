@@ -1,5 +1,5 @@
-import time
-import string, random
+import time, string, random, langdetect
+
 
 def next_two_weeks():
     return int(time.time()) + 60 * 60 * 24 * 14
@@ -35,4 +35,8 @@ def serialize_data_recursively(Serializer, data:dict, default:dict=None):
         data = default # which is None
 
     return data
+
+def what_language_is_this(text: str) -> str:
+    """Return the language of the text"""
+    return langdetect.detect(text)
 
