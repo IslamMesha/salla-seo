@@ -1,4 +1,5 @@
 import os
+import json
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -16,15 +17,22 @@ from app.enums import CookieKeys
 from app.authentication import TokenAuthSupportCookie
 
 
+def get_products() -> list:
+    with open('./debug/3-products-list.json') as f:
+        products = json.load(f)
+
+    return products['data']
+
 @authentication_classes([TokenAuthSupportCookie])
 def index(request):
     app_id = os.environ.get('SALLA_APP_ID')
     context = {
         'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
         'user': request.user,
+        'products': get_products(),
     }
-    
-    print(request.user.is_authenticated and request.user.account)
+
+    print(request.user.is_authenticated and request.user)
     return render(request, 'index.html', context=context)
 
 
