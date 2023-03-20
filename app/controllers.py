@@ -182,4 +182,47 @@ class ChatGPT:
         return instance
 
 
+class ChatGPTProductPromptGenerator:
+    """Class to generate chatgpt valid prompt from the product data"""
+        
+    def __init__(self, data: dict) -> None:
+        self.language = utils.what_language_is_this(data['product_name'])
+        self.template_name_format = 'product_{type}_{self.language}'
+        self.data = data
+
+    def __get_template(self, t_type: str) -> str:
+        template_name = (
+            self.template_name_format
+                .format(type=t_type, self=self)
+                .upper()
+        )
+        template = getattr(self.ChatGPTPromptTemplates, template_name, None)
+        assert template is not None, f'No template found for {template_name}'
+
+        return template
+
+    def __get_prompt(self, t_type: str) -> str:
+        # TODO translate template labels into valid python
+        # formatted according to data sent to the class
+        template = self.__get_template(t_type)
+        return template.format(**self.data)
+
+    def ask_for_description(self) -> str:
+        _type = self.Types.DESCRIPTION
+        return self.__get_prompt(_type)
+
+
+    class Types:
+        DESCRIPTION = 'description'
+        SEO_TITLE = 'seo_title'
+
+    class ChatGPTPromptTemplates:
+        # hold templates for asking chatgpt
+        # NOTE every type should have many languages
+        # NOTE name must follow this format: product_{type}_{language}
+        PRODUCT_DESCRIPTION_EN = 'write a brief about product {product_name}'
+        PRODUCT_DESCRIPTION_AR = 'اكتب ملخصاً عن المنتج {product_name}'
+
+
+        
 
