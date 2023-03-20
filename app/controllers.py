@@ -125,6 +125,12 @@ class SallaMerchantReader(SallaBaseReader):
 
         return self.get(endpoint, params)
 
+    # TODO delete this method later
+    # because product will be cached
+    def get_product(self, id: str) -> dict:
+        endpoint = '/products/{id}}'
+        return self.get(endpoint)
+
 
 class SallaAppSettingsReader(SallaBaseReader):
     APP_ID = os.getenv('SALLA_APP_ID')
