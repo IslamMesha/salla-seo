@@ -186,7 +186,7 @@ class ChatGPTProductPromptGenerator:
     """Class to generate chatgpt valid prompt from the product data"""
         
     def __init__(self, data: dict) -> None:
-        self.language = utils.what_language_is_this(data['product_name'])
+        self.language = utils.get_language(data['product_name'])
         self.template_name_format = 'product_{type}_{self.language}'
         self.data = data
 
@@ -221,7 +221,7 @@ class ChatGPTProductPromptGenerator:
         # NOTE every type should have many languages
         # NOTE name must follow this format: product_{type}_{language}
         PRODUCT_DESCRIPTION_EN = 'write a brief about product {product_name}'
-        PRODUCT_DESCRIPTION_AR = 'اكتب ملخصاً عن المنتج {product_name}'
+        PRODUCT_DESCRIPTION_AR = 'اكتب ملخصاً قصير عن منتج أسمه: {product_name}'
 
 
         
