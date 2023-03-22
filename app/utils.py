@@ -36,7 +36,16 @@ def serialize_data_recursively(Serializer, data:dict, default:dict=None):
 
     return data
 
-def what_language_is_this(text: str) -> str:
+def get_language(text: str) -> str:
     """Return the language of the text"""
-    return langdetect.detect(text)
+    lang = langdetect.detect(text)
+    space = ['en', 'ar']
+
+    if lang not in space:
+        # determine the language by the first character
+        garbage = string.whitespace + string.punctuation + string.digits
+        cleaned_text = text.strip(garbage) or 'Empty text'
+
+        lang = 'en' if cleaned_text[0] in string.ascii_letters else 'ar'
+    return lang
 
