@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,7 +49,10 @@
             </div>
 
             <div class="bottom-0 flex-grow flex flex-col-reverse">
-                <button class="block bg-red-300 w-full font-bold text-white py-2 bottom-0" data-product-id="{{ product.id }}">Get Description</button>
+                <button 
+                    class="block bg-red-300 w-full font-bold text-white py-2 bottom-0"
+                    data-product="{{ product|to_json }}"
+                >Get Description</button>
             </div>
         </div>
         {% endfor %}
@@ -55,20 +60,25 @@
     </div>
 
     <script>
-        const buttons = document.querySelectorAll('button[data-product-id]');
+        const buttons = document.querySelectorAll('button[data-product]');
         buttons.forEach(button => {
             button.addEventListener('click', () => {
-                const productId = button.getAttribute('data-product-id');
-                console.log(productId);
-                // const url = `https://salla.sa/api/v1/products/${productId}`;
-                // fetch(url)
-                //     .then(response => response.json())
-                //     .then(data => {
-                //         const product = data.data;
-                //         const description = product.description;
-                //         const descriptionElement = button.parentElement.previousElementSibling.querySelector('.product-description');
-                //         descriptionElement.innerText = description;
-                //     });
+                const product = button.getAttribute('data-product');
+                const url = '/product/get-description/';
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: product
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const description = data.description;
+                        console.log(description);
+                        const descriptionElement = button.parentElement.previousElementSibling.querySelector('.product-description');
+                        descriptionElement.innerText = description;
+                    });
+
             });
         });
     </script>
