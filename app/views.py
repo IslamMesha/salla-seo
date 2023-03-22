@@ -82,7 +82,7 @@ class ProductGetDescriptionAPI(APIView):
 
     def ask_chat_gpt(self, data: dict) -> ChatGPTLog:
         prompt_generator = ChatGPTProductPromptGenerator(data)
-        description_prompt = prompt_generator.get_description_prompt()
+        description_prompt = prompt_generator.ask_for_description()
 
         chat_gpt = ChatGPT().ask(description_prompt)
         return chat_gpt
