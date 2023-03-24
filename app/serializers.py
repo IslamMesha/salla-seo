@@ -15,6 +15,15 @@ class SallaUserSerializer(serializers.ModelSerializer):
         }
 
 
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Account
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True},
+        }
+
+
 class SallaStoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SallaStore
@@ -23,6 +32,22 @@ class SallaStoreSerializer(serializers.ModelSerializer):
             'id': {'read_only': True},
             'created_at': {'read_only': True},
             'updated': {'read_only': True},
+        }
+
+
+class ChatGPTLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ChatGPTLog
+        fields = '__all__'
+
+
+class UserPromptSerializer(serializers.ModelSerializer):
+    chat_gpt_log = ChatGPTLogSerializer(read_only=True)
+    class Meta:
+        model = models.UserPrompt
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True},
         }
 
 
