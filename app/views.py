@@ -16,6 +16,7 @@ from app.utils import set_cookie
 from app.enums import CookieKeys
 from app.authentication import TokenAuthSupportCookie
 from app.serializers import ProductGetDescriptionPOSTBodySerializer
+from app import serializers
 
 
 def get_products() -> list:
@@ -108,4 +109,21 @@ class ProductGetDescriptionAPI(APIView):
         UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
 
         return Response({'description': chat_gpt.answer})
+
+
+class ProductListDescriptionsAPI(ListAPIView):
+    prompt_type = ChatGPTProductPromptGenerator.Types.DESCRIPTION
+    serializer_class = serializers.UserPromptSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs['product_id']
+        return (
+            self.request.user
+                .prompts
+                .filter(
+                    meta__prompt_type=self.prompt_type,
+                    meta__product_id=product_id,
+                )
+                .order_by('-id')
+        )
 
