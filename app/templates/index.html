@@ -64,7 +64,7 @@
         buttons.forEach(button => {
             button.addEventListener('click', () => {
                 const product = button.getAttribute('data-product');
-                const url = '/product/get-description/';
+                const url = '/product/description/';
 
                 fetch(url, {
                     method: 'POST',
