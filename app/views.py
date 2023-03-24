@@ -11,7 +11,7 @@ from rest_framework.decorators import authentication_classes
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator
 from app.exceptions import SallaOauthFailedException
-from app.models import Account, UserPrompt, ChatGPTLog
+from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
 from app.utils import set_cookie
 from app.enums import CookieKeys
 from app.authentication import TokenAuthSupportCookie
@@ -87,19 +87,23 @@ class ProductGetDescriptionAPI(APIView):
         chat_gpt = ChatGPT().ask(description_prompt)
         return chat_gpt
 
-    def post(self, request):
-        # check if user already asked for this product
-        data = self.get_data(request)
-        user_prompts_qs = request.user.prompts.filter(
+    def check_in_database(self, user: SallaUser, data: dict) -> ChatGPTLog:
+        user_prompts_qs = user.prompts.filter(
             meta__product_id=data['product_id'],
             meta__prompt_type=data['prompt_type'],
         )
 
+        chat_gpt = None
         if user_prompts_qs.exists():
             chat_gpt = user_prompts_qs.first().chat_gpt_log
-        else:
-            chat_gpt = self.ask_chat_gpt(data)
-            UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
+
+        return chat_gpt
+
+    def post(self, request):
+        # check if user already asked for this product
+        data = self.get_data(request)
+        chat_gpt = self.ask_chat_gpt(data)
+        UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
 
         return  Response({'description': chat_gpt.answer})
 
