@@ -24,6 +24,7 @@ def get_products() -> list:
 
     return products['data']
 
+
 @authentication_classes([TokenAuthSupportCookie])
 def index(request):
     app_id = os.environ.get('SALLA_APP_ID')
@@ -56,6 +57,7 @@ def oauth_callback(request):
 class Test(APIView):
     def get(self, request):
         return Response({'message': 'Hello World!'})
+
 
 class ProductsListAPI(ListAPIView):
     def get(self, request):
@@ -105,5 +107,5 @@ class ProductGetDescriptionAPI(APIView):
         chat_gpt = self.ask_chat_gpt(data)
         UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
 
-        return  Response({'description': chat_gpt.answer})
+        return Response({'description': chat_gpt.answer})
 
