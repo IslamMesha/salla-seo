@@ -26,6 +26,15 @@ def get_products() -> list:
     return products['data']
 
 
+def get_pagination() -> dict:
+    with open('./debug/3-products-list.json', encoding='utf8') as f:
+        products = json.load(f)
+
+    return products['pagination']
+
+
+
+
 @authentication_classes([TokenAuthSupportCookie])
 def index(request):
     app_id = os.environ.get('SALLA_APP_ID')
@@ -33,6 +42,7 @@ def index(request):
         'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
         'user': request.user,
         'products': get_products(),
+        'pagination': get_pagination(),
     }
 
     print(request.user.is_authenticated and request.user)

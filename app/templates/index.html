@@ -65,6 +65,38 @@
         {% endfor %}
 
     </div>
+    <div class="flex flex-wrap justify-center">
+        <!-- {% for page in 20|times %}
+        <div class="border-2 border-black w-14 flex-grow-0 text-center">
+            <a class="font-bold text-5xl w-full block" href="?page={{ page }}">{{ page }}</a>
+        </div>
+        {% endfor %} -->
+
+        
+        {% if pagination.currentPage > 1 %}
+        <div class="current page border-2 border-black w-14 flex-grow-0 text-center">
+            <a 
+                class="font-bold text-5xl w-full block" 
+                href="?page={{ pagination.currentPage|minus }}"
+            >{{ pagination.currentPage|minus }}</a>
+        </div>
+        {% endif %}
+        <div class="current page border-2 border-black w-14 flex-grow-0 text-center bg-red-200">
+            <a
+                class="font-bold text-5xl w-full block" 
+                href="?page={{ pagination.currentPage }}"
+            >{{ pagination.currentPage }}</a>
+        </div>
+        {% if pagination.currentPage < pagination.totalPages %}
+        <div class="current page border-2 border-black w-14 flex-grow-0 text-center">
+            <a 
+                class="font-bold text-5xl w-full block" 
+                href="?page={{ pagination.currentPage|plus }}"
+            >{{ pagination.currentPage|plus }}</a>
+        </div>
+        {% endif %}
+    </div>
+    {{ pagination }}
 
     <script>
         const getDescriptionButtons = document.querySelectorAll('button[data-product]');
