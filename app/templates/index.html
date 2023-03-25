@@ -49,6 +49,13 @@
             </div>
 
             <div class="bottom-0 flex-grow flex flex-col-reverse">
+                <button
+                    class="block bg-blue-300 w-full font-bold text-white py-2 bottom-0"
+                    data-product-id="{{ product.id }}"
+                >
+                    List Old Descriptions
+                </button>
+
                 <button 
                     class="block bg-red-300 w-full font-bold text-white py-2 bottom-0"
                     data-product="{{ product|to_json }}"
@@ -60,8 +67,10 @@
     </div>
 
     <script>
-        const buttons = document.querySelectorAll('button[data-product]');
-        buttons.forEach(button => {
+        const getDescriptionButtons = document.querySelectorAll('button[data-product]');
+        const listOldDescriptionsButtons = document.querySelectorAll('button[data-product-id]');
+
+        getDescriptionButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const product = button.getAttribute('data-product');
                 const url = '/product/description/';
@@ -79,6 +88,19 @@
                         descriptionElement.innerText = description;
                     });
 
+            });
+        });
+        
+        listOldDescriptionsButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const url = `/product/description/${productId}/`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    });
             });
         });
     </script>
