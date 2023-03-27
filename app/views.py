@@ -43,6 +43,7 @@ def index(request):
         'user': request.user,
         'products': get_products(),
         'pagination': get_pagination(),
+        'keywords': []
     }
 
     print(request.user.is_authenticated and request.user)
