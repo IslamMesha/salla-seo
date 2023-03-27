@@ -220,8 +220,8 @@ class ChatGPTProductPromptGenerator:
         # hold templates for asking chatgpt
         # NOTE every type should have many languages
         # NOTE name must follow this format: product_{type}_{language}
-        PRODUCT_DESCRIPTION_EN = 'write a brief about product {product_name}'
-        PRODUCT_DESCRIPTION_AR = 'اكتب ملخصاً قصير عن منتج أسمه: {product_name}'
+        PRODUCT_DESCRIPTION_EN = 'write a brief about product {product_name}, using these keywords: {keywords_str}'
+        PRODUCT_DESCRIPTION_AR = 'اكتب ملخصاً قصير عن منتج أسمه: {product_name}, باستخدام تلك الكلمات المفتاحية: {keywords_str}'
 
 
         

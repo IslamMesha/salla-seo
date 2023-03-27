@@ -90,4 +90,8 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     # Those will be used as values in the chatgpt templates
     product_id = serializers.CharField(source='id', read_only=True)
     product_name = serializers.CharField(source='name', read_only=True)
+    keywords_str = serializers.SerializerMethodField(read_only=True)
+    
+    def get_keywords_str(self, obj):
+        return ', '.join(obj['keywords'])
 
