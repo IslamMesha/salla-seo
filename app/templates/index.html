@@ -14,7 +14,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<body class="p-8 bg-gray-100 select-none">
+<body class="p-8 bg-gray-100 select-none m-auto" style="max-width: 80vw">
     <h1 class="text-3xl font-bold text-center text-black">Welcome to Salla SEO Plugin.</h1>
     
     {% if messages %}
@@ -34,10 +34,7 @@
     </div>
     <div class="products pt-12 flex flex-wrap">
         {% for product in products %}
-        <div class="
-            product bg-white w-56 rounded-md overflow-hidden mb-4
-            flex-shrink-0 flex-grow mx-2 flex flex-col
-        ">
+        <div class="product bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col">
             <div class="product-image">
                 <img class="block w-full" src="{{ product.main_image }}"
                     alt="Product Image">
@@ -46,6 +43,24 @@
                 <h3 class="product-title font-bold mb-2">{{ product.name }}</h3>
                 <p class="product-description text-sm break-all">{{ product.description }}</p>
                 <p class="product-price text-right">{{ product.price.amount }} {{ product.price.currency }}</p>
+            </div>
+
+            <div class="keywords px-4 py-5" style="font-size: 0;">
+                <div>
+                    
+                    {% for keyword in keywords %}
+                    <span class="keyword text-sm text-center px-1 py-1 bg-yellow-300 rounded font-bold mr-1 mb-1 inline-block">
+                        {{ keyword }}<!--
+                        --><span class="delete-keyword rounded inline-block text-white font-bold bg-red-500 w-4 text-center ml-1">&times;</span>
+                    </span>
+                    {% endfor %}
+                </div>
+
+                <div class="flex rounded mt-2 overflow-hidden">
+                    <input type="text" class="border-2 border-solid border-gray-300 w-full p-1 text-sm flex-grow outline-none" placeholder="Add a keyword">
+                    <input type="button" class="add-keyword text-sm py-1 px-2 font-bold text-white bg-blue-500 flex-shrink-0 flex-grow-0" value="Add">
+                </div>
+
             </div>
 
             <div class="bottom-0 flex-grow flex flex-col-reverse">
@@ -63,16 +78,8 @@
             </div>
         </div>
         {% endfor %}
-
     </div>
-    <div class="flex flex-wrap justify-center">
-        <!-- {% for page in 20|times %}
-        <div class="border-2 border-black w-14 flex-grow-0 text-center">
-            <a class="font-bold text-5xl w-full block" href="?page={{ page }}">{{ page }}</a>
-        </div>
-        {% endfor %} -->
-
-        
+    <div class="pagination flex flex-wrap justify-center">        
         {% if pagination.currentPage > 1 %}
         <div class="current page border-2 border-black w-14 flex-grow-0 text-center">
             <a 
@@ -96,28 +103,37 @@
         </div>
         {% endif %}
     </div>
-    {{ pagination }}
 
     <script>
         const getDescriptionButtons = document.querySelectorAll('button[data-product]');
         const listOldDescriptionsButtons = document.querySelectorAll('button[data-product-id]');
+        const deleteKeywordButtons = document.querySelectorAll('.delete-keyword');
+        const addKeywordButtons = document.querySelectorAll('input.add-keyword[type="button"]');
 
         getDescriptionButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const product = button.getAttribute('data-product');
+                const product = JSON.parse( button.getAttribute('data-product') );
                 const url = '/product/description/';
+
+                const keywordsElement = button.parentElement.parentElement.querySelector('.keywords div:first-child');
+                const keywords = Array.from(
+                    keywordsElement.querySelectorAll('.keyword')
+                ).map(keyword => keyword.firstChild.textContent.trim())
 
                 fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: product
+                    body: JSON.stringify({...product, keywords})
                 })
                     .then(response => response.json())
                     .then(data => {
                         const description = data.description;
                         console.log(description);
-                        const descriptionElement = button.parentElement.previousElementSibling.querySelector('.product-description');
+                        const descriptionElement = button.parentElement.parentElement.querySelector('.product-description');
                         descriptionElement.innerText = description;
+                    })
+                    .catch(error => {
+                        console.log(error);
                     });
 
             });
@@ -135,6 +151,41 @@
                     });
             });
         });
+        
+        deleteKeywordButtons.forEach(button => 
+            button.addEventListener('click', () => button.parentElement.remove() )
+        )
+
+        addKeywordButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const keyword = button.previousElementSibling.value;
+                const keywordsElement = button.parentElement.parentElement.parentElement.querySelector('.keywords div:first-child');
+                // const keywords = ;
+                const keywordsArray = Array.from(
+                    keywordsElement.querySelectorAll('.keyword')
+                ).map(keyword => keyword.firstChild.textContent.trim());
+
+                if (keywordsArray.includes(keyword)) {
+                    button.previousElementSibling.value = '';
+                    button.previousElementSibling.focus();
+                    return;
+                }
+
+                const keywordElement = document.createElement('span');
+                keywordElement.classList.add('keyword', 'text-sm', 'text-center', 'px-1', 'py-1', 'bg-yellow-300', 'rounded', 'font-bold', 'mr-1', 'mb-1', 'inline-block');
+                keywordElement.innerText = keyword;
+                const deleteKeywordButton = document.createElement('span');
+                deleteKeywordButton.classList.add('delete-keyword', 'rounded', 'inline-block', 'text-white', 'font-bold', 'bg-red-500', 'w-4', 'text-center', 'ml-1');
+                deleteKeywordButton.innerHTML = '&times;';
+                keywordElement.appendChild(deleteKeywordButton);
+                keywordsElement.appendChild(keywordElement);
+                deleteKeywordButton.addEventListener('click', () => deleteKeywordButton.parentElement.remove() );
+
+                button.previousElementSibling.value = '';
+                button.previousElementSibling.focus();
+            });
+        })
+
     </script>
 
 </body>
