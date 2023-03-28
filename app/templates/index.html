@@ -157,35 +157,72 @@
             }
         }
 
+        function createDeleteKeywordButton(){
+            const deleteKeywordButton = document.createElement('span');
+            const classes = [
+                'delete-keyword', 'rounded', 'inline-block', 'text-white', 'font-bold', 
+                'bg-red-500', 'hover:bg-red-700', 'cursor-pointer','w-4', 'text-center', 'ml-1'
+            ];
+
+            deleteKeywordButton.classList.add(...classes);
+            deleteKeywordButton.innerHTML = '&times;';
+
+            return deleteKeywordButton;
+        }
+
+        function createKeywordElement(keyword) {
+            const keywordElement = document.createElement('span');
+            const classes = [
+                'keyword', 'text-sm', 'text-center', 'px-1', 'py-1', 'bg-yellow-300',
+                'rounded', 'font-bold', 'mr-1', 'mb-1', 'inline-block',
+            ]
+
+            keywordElement.classList.add(...classes);
+            keywordElement.innerText = keyword;
+
+            return keywordElement;
+        }
+
+        function getKeywords(keywordsElement){
+            return Array.from(
+                keywordsElement.querySelectorAll('.keyword')
+            ).map(keyword => keyword.firstChild.textContent.trim())
+        }
+
+        function addKeyword(keyword, keywordsElement){
+            const keywordElement = createKeywordElement(keyword);
+            const deleteKeywordButton = createDeleteKeywordButton();
+            keywordElement.appendChild(deleteKeywordButton);
+            keywordsElement.appendChild(keywordElement);
+
+            deleteKeywordButton.addEventListener('click', () => deleteKeywordButton.parentElement.remove());
+        }
+
+        function resetTextInputField(textInputField){
+            textInputField.value = '';
+            textInputField.focus();
+        }
+
         getDescriptionButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const undo = buttonToLoading(button);
-                const product = JSON.parse(button.getAttribute('data-product'));
                 const url = '/product/description/';
-
-                const keywordsElement = button.parentElement.parentElement.querySelector(
-                    '.keywords div:first-child');
-                const keywords = Array.from(
-                    keywordsElement.querySelectorAll('.keyword')
-                ).map(keyword => keyword.firstChild.textContent.trim())
+                const keywordsElement = button.parentElement.parentElement.querySelector('.keywords div:first-child');
+                const body = {
+                    product: JSON.parse(button.getAttribute('data-product')),
+                    keywords: getKeywords(keywordsElement)
+                };
 
                 fetch(url, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            ...product,
-                            keywords
-                        })
-                    })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                })
                     .then(response => response.json())
                     .then(data => {
-                        const description = data.description;
-                        console.log(description);
-                        const descriptionElement = button.parentElement.parentElement.querySelector(
-                            '.product-description');
-                        descriptionElement.innerText = description;
+                        const descriptionElement = button.parentElement.parentElement.querySelector('.product-description');
+                        descriptionElement.innerText = data.description;
+
                         undo();
                     })
                     .catch(error => {
@@ -203,18 +240,13 @@
                 const undo = buttonToLoading(button);
                 const productId = button.getAttribute('data-product-id');
                 const product = JSON.parse(
-                    button
-                        .parentElement
-                        .querySelector('[data-product]')
-                        .getAttribute('data-product')
+                    button.parentElement.querySelector('[data-product]').getAttribute('data-product')
                 );
                 const url = `/product/description/${productId}/`;
 
-                console.log(product)
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         const popup = document.getElementById('popup').querySelector('.bg-white');
                         popup.querySelector('h2').innerText = product.name;
                         data.forEach(description => {
@@ -223,7 +255,7 @@
 
                             descriptionElement.innerText = description.chat_gpt_log.answer;
                             descriptionElement.classList.add('mb-8', 'pb-5', 'border-b-2', 'border-solid');
-                            
+
                             if (description.meta.keywords_str){
                                 keywordsElement.innerText = description.meta.keywords_str;
                                 keywordsElement.classList.add('text-gray-500', 'text-sm', 'block', 'font-bold', 'flex', 'flex-row-reverse');
@@ -247,34 +279,18 @@
 
         addKeywordButtons.forEach(button => {
             button.addEventListener('click', () => {
-                const keyword = button.previousElementSibling.value;
-                const keywordsElement = button.parentElement.parentElement.parentElement.querySelector(
-                    '.keywords div:first-child');
-                // const keywords = ;
-                const keywordsArray = Array.from(
-                    keywordsElement.querySelectorAll('.keyword')
-                ).map(keyword => keyword.firstChild.textContent.trim());
+                const inputField = button.previousElementSibling;
+                const keyword = inputField.value;
+                const keywordsElement = button.parentElement.parentElement.parentElement.querySelector('.keywords div:first-child');
+                const keywordsArray = getKeywords(keywordsElement);
 
                 if (keywordsArray.includes(keyword)) {
-                    button.previousElementSibling.value = '';
-                    button.previousElementSibling.focus();
+                    resetTextInputField(inputField);
                     return;
                 }
 
-                const keywordElement = document.createElement('span');
-                keywordElement.classList.add('keyword', 'text-sm', 'text-center', 'px-1', 'py-1', 'bg-yellow-300', 'rounded', 'font-bold', 'mr-1', 'mb-1', 'inline-block');
-                keywordElement.innerText = keyword;
-                const deleteKeywordButton = document.createElement('span');
-                deleteKeywordButton.classList.add('delete-keyword', 'rounded', 'inline-block',
-                    'text-white', 'font-bold', 'bg-red-500', 'hover:bg-red-700', 'cursor-pointer','w-4', 'text-center', 'ml-1');
-                deleteKeywordButton.innerHTML = '&times;';
-                keywordElement.appendChild(deleteKeywordButton);
-                keywordsElement.appendChild(keywordElement);
-                deleteKeywordButton.addEventListener('click', () => deleteKeywordButton.parentElement
-                    .remove());
-
-                button.previousElementSibling.value = '';
-                button.previousElementSibling.focus();
+                addKeyword(keyword, keywordsElement);
+                resetTextInputField(inputField);
             });
         })
     
