@@ -1,0 +1,1 @@
+# Salla SEO Plugin
