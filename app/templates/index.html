@@ -12,6 +12,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
         integrity="sha512-wnea99uKIC3TJF7v4eKk4Y+lMz2Mklv18+r4na2Gn1abDRPPOeef95xTzdwGD9e6zXJBteMIhZ1+68QC5byJZw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Style the popup container */
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </head>
 
 <body class="p-8 bg-gray-100 select-none m-auto" style="max-width: 80vw">
@@ -93,25 +108,6 @@
         {% endif %}
     </div>
 
-    <!-- PopUp -->
-    <style>
-        /* Style the popup container */
-        .popup {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-    </style>
-    <!-- Button to trigger the popup -->
-    <!-- <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="openPopup()">Open
-        Popup</button> -->
-
     <!-- Popup container -->
     <div id="popup" class="popup">
         <!-- Popup content -->
@@ -120,12 +116,16 @@
                 <button class="text-gray-500 hover:text-gray-700 font-bold text-xl"
                     onclick="closePopup()">&times;</button>
             </div>
-            <h2 class="text-xl font-bold mb-4">Popup Example</h2>
+            <h2 class="text-xl font-bold mb-4">Popup</h2>
         </div>
     </div>
 
-    <!-- JavaScript to control the popup -->
     <script>
+        const getDescriptionButtons = document.querySelectorAll('button[data-product]');
+        const listOldDescriptionsButtons = document.querySelectorAll('button[data-product-id]');
+        const deleteKeywordButtons = document.querySelectorAll('.delete-keyword');
+        const addKeywordButtons = document.querySelectorAll('.add-keyword');
+
         function openPopup() {
             document.getElementById("popup").style.display = "block";
         }
@@ -135,13 +135,6 @@
             popup.style.display = "none";
             popup.querySelectorAll('p').forEach(p => p.remove())
         }
-    </script>
-
-    <script>
-        const getDescriptionButtons = document.querySelectorAll('button[data-product]');
-        const listOldDescriptionsButtons = document.querySelectorAll('button[data-product-id]');
-        const deleteKeywordButtons = document.querySelectorAll('.delete-keyword');
-        const addKeywordButtons = document.querySelectorAll('.add-keyword');
 
         function buttonToLoading(button){
             const oldText = button.innerText;
@@ -203,73 +196,71 @@
             textInputField.focus();
         }
 
+        function createDescriptionPopupListItem(description){
+            const descriptionElement = document.createElement('p');
+            const keywordsElement = document.createElement('span');
+
+            descriptionElement.innerText = description.chat_gpt_log.answer;
+            descriptionElement.classList.add('mb-8', 'pb-5', 'border-b-2', 'border-solid');
+
+            if (description.meta.keywords_str){
+                keywordsElement.innerText = description.meta.keywords_str;
+                keywordsElement.classList.add('text-gray-500', 'text-sm', 'block', 'font-bold', 'flex', 'flex-row-reverse');
+                descriptionElement.appendChild(keywordsElement);
+            }
+
+            return descriptionElement;
+        }
+
         getDescriptionButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const undo = buttonToLoading(button);
                 const url = '/product/description/';
                 const keywordsElement = button.parentElement.parentElement.querySelector('.keywords div:first-child');
-                const body = {
-                    product: JSON.parse(button.getAttribute('data-product')),
-                    keywords: getKeywords(keywordsElement)
+                const request = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        product: JSON.parse(button.getAttribute('data-product')),
+                        keywords: getKeywords(keywordsElement)
+                    })
                 };
 
-                fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
-                })
+                fetch(url, request)
                     .then(response => response.json())
                     .then(data => {
                         const descriptionElement = button.parentElement.parentElement.querySelector('.product-description');
                         descriptionElement.innerText = data.description;
-
-                        undo();
                     })
-                    .catch(error => {
-                        console.log(error);
-                        undo();
-                    });
+                    .catch(error => console.log(error) )
+                    .finally(() => undo() );
 
             });
         });
 
         listOldDescriptionsButtons.forEach(button => {
             button.addEventListener('click', () => {
-                openPopup();
-
                 const undo = buttonToLoading(button);
+                const url = `/product/description/${productId}/`;
                 const productId = button.getAttribute('data-product-id');
                 const product = JSON.parse(
                     button.parentElement.querySelector('[data-product]').getAttribute('data-product')
                 );
-                const url = `/product/description/${productId}/`;
+
+                openPopup();
 
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         const popup = document.getElementById('popup').querySelector('.bg-white');
+
                         popup.querySelector('h2').innerText = product.name;
-                        data.forEach(description => {
-                            const descriptionElement = document.createElement('p');
-                            const keywordsElement = document.createElement('span');
-
-                            descriptionElement.innerText = description.chat_gpt_log.answer;
-                            descriptionElement.classList.add('mb-8', 'pb-5', 'border-b-2', 'border-solid');
-
-                            if (description.meta.keywords_str){
-                                keywordsElement.innerText = description.meta.keywords_str;
-                                keywordsElement.classList.add('text-gray-500', 'text-sm', 'block', 'font-bold', 'flex', 'flex-row-reverse');
-                                descriptionElement.appendChild(keywordsElement);
-                            }
-
-                            popup.appendChild(descriptionElement);
-                        })
-                        undo();
+                        data.forEach(description => popup.appendChild(
+                            createDescriptionPopupListItem(description)
+                        ))
                     })
-                    .catch(error => {
-                        console.log(error);
-                        undo();
-                    });
+                    .catch(error => console.log(error))
+                    .finally(() => undo() );
             });
         });
 
