@@ -149,6 +149,30 @@ class SallaAppSettingsReader(SallaBaseReader):
         return self.get(endpoint)
 
 
+class SallaWriter:
+    def __init__(self, account: Account) -> None:
+        self.access_token = account.access_token
+        self.base_url = os.getenv('SALLA_BASE_URL')
+
+    def put(self, endpoint: str, body: dict) -> dict:
+        headers = { 
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json',
+        }
+        url = f'{self.base_url}{endpoint}'
+        response = requests.put(url, headers=headers, json=body)
+
+        if response.status_code != 201:
+            print(f'\n\nError: {response.status_code} {response.text}, \n\n')
+            raise SallaEndpointFailureException()
+
+        return response.json()['data']
+
+    def product_update(self, id: str, body: dict) -> dict:
+        endpoint = f'/products/{id}'
+        return self.put(endpoint, body)
+
+
 class ChatGPT:
     def __init__(self) -> None:
         import openai
