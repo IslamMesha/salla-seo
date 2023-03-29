@@ -126,6 +126,12 @@
         const deleteKeywordButtons = document.querySelectorAll('.delete-keyword');
         const addKeywordButtons = document.querySelectorAll('.add-keyword');
 
+        function createElement(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.firstChild
+        }
+
         function openPopup() {
             document.getElementById("popup").style.display = "block";
         }
@@ -133,7 +139,7 @@
         function closePopup(e) {
             const popup = document.getElementById("popup")
             popup.style.display = "none";
-            popup.querySelectorAll('p').forEach(p => p.remove())
+            popup.querySelectorAll('.description-item').forEach(elm => elm.remove())
         }
 
         function buttonToLoading(button){
@@ -197,15 +203,16 @@
         }
 
         function createDescriptionPopupListItem(description){
-            const descriptionElement = document.createElement('p');
-            const keywordsElement = document.createElement('span');
-
-            descriptionElement.innerText = description.chat_gpt_log.answer;
-            descriptionElement.classList.add('mb-8', 'pb-5', 'border-b-2', 'border-solid');
-
+            const descriptionElement = createElement(`<div class="description-item mb-8 pb-5 border-b-2 border-solid">
+                <span>${description.chat_gpt_log.answer}</span>
+                <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
+            </div>`);
+            
             if (description.meta.keywords_str){
+                const keywordsElement = document.createElement('span');
+
                 keywordsElement.innerText = description.meta.keywords_str;
-                keywordsElement.classList.add('text-gray-500', 'text-sm', 'block', 'font-bold', 'flex', 'flex-row-reverse');
+                keywordsElement.classList.add('text-gray-500', 'text-sm', 'block', 'font-bold', 'flex', 'flex-row-reverse', 'mt-3');
                 descriptionElement.appendChild(keywordsElement);
             }
 
