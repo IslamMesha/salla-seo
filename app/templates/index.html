@@ -215,7 +215,7 @@
         getDescriptionButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const undo = buttonToLoading(button);
-                const url = '/product/description/';
+                const url = '/ask-gpt/description/';
                 const keywordsElement = button.parentElement.parentElement.querySelector('.keywords div:first-child');
                 const request = {
                     method: 'POST',
@@ -241,7 +241,7 @@
         listOldDescriptionsButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const undo = buttonToLoading(button);
-                const url = `/product/description/${productId}/`;
+                const url = `/log/descriptions/${productId}/`;
                 const productId = button.getAttribute('data-product-id');
                 const product = JSON.parse(
                     button.parentElement.querySelector('[data-product]').getAttribute('data-product')
