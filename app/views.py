@@ -9,7 +9,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.decorators import authentication_classes
 
-from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator
+from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter
 from app.exceptions import SallaOauthFailedException
 from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
 from app.utils import set_cookie
@@ -31,8 +31,6 @@ def get_pagination() -> dict:
         products = json.load(f)
 
     return products['pagination']
-
-
 
 
 @authentication_classes([TokenAuthSupportCookie])
@@ -120,6 +118,26 @@ class ProductGetDescriptionAPI(APIView):
         UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
 
         return Response({'description': chat_gpt.answer})
+
+
+class ProductUpdateAPI(APIView):
+    post_body_serializer = serializers.ProductUpdatePOSTBodySerializer
+
+    def get_data(self, request) -> dict:
+        serializer = self.post_body_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        return data
+
+    def post(self, request, product_id):
+        account = request.user.account
+        body = self.get_data(request)
+
+        writer = SallaWriter(account)
+        response_data = writer.product_update(product_id, body)
+
+        return Response(response_data)
 
 
 class ProductListDescriptionsAPI(ListAPIView):
