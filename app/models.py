@@ -8,6 +8,7 @@ from app import managers
 
 
 class SallaUser(AbstractBaseUser):
+    # TODO in callback check if user exists using the salla_id
     salla_id = models.CharField(max_length=64, unique=True, db_index=True)
 
     name = models.CharField(max_length=128, blank=True, null=True)
