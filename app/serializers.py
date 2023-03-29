@@ -95,3 +95,7 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     def get_keywords_str(self, obj):
         return ', '.join(obj['keywords'])
 
+
+class ProductUpdatePOSTBodySerializer(serializers.Serializer):
+    description = serializers.CharField(required=True)
+
