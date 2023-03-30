@@ -87,16 +87,29 @@ class Account(models.Model):
         return instance
 
     @property
-    def is_alive(self):
+    def is_alive(self) -> bool:
         return self.expires_in > int(time.time())
 
-    def refresh_access_token(self):
+    def refresh_access_token(self) -> bool:
         from app.controllers import SallaOAuth
 
         data = SallaOAuth().refresh_access_token(self.refresh_token)
         self.store(data, self)
 
         return True
+
+    def get_homepage_context(self, params: dict ={}) -> dict:
+        from app.controllers import SallaMerchantReader
+
+        products = SallaMerchantReader(self).get_products(params)
+        context = {
+            'user': self.user,
+            'products': products['data'],
+            'pagination': products['pagination'],
+            'is_authenticated': True,
+        }
+
+        return context
 
     def __str__(self):
         return self.public_token

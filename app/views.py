@@ -33,14 +33,7 @@ class Index(APIView):
         }
 
         if request.user.is_authenticated and hasattr(request.user, 'account'):
-            products = SallaMerchantReader(request.user.account).get_products(request.GET)
-
-            context.update({
-                'user': request.user,
-                'products': products['data'],
-                'pagination': products['pagination'],
-                'is_authenticated': True,
-            })
+            context = request.user.account.get_homepage_context(request.GET)
 
         return Response(context, template_name='index.html')
 
@@ -51,8 +44,8 @@ def oauth_callback(request):
         messages.success(request, 'Login Success.')
         data = SallaOAuth().get_access_token(code)
         account = Account.store(data)
-        response = redirect('app:index')
-        
+        response = render(request, 'index.html', account.get_homepage_context())
+
         month = 60 * 60 * 24 * 30
         set_cookie(response, CookieKeys.AUTH_TOKEN.value, account.public_token, max_age=month)
     else:
