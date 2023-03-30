@@ -129,7 +129,7 @@
         function createElement(html) {
             const div = document.createElement('div');
             div.innerHTML = html;
-            return div.firstChild
+            return div.firstElementChild
         }
 
         function openPopup() {
@@ -209,7 +209,7 @@
                     <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
                 </div>
             `);
-            
+
             if (description.meta.keywords_str){
                 const keywordsElement = document.createElement('span');
 
@@ -220,17 +220,19 @@
 
             return descriptionElement;
         }
-
+        
         getDescriptionButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const undo = buttonToLoading(button);
+                const cardElement = button.parentElement.parentElement;
                 const url = "{% url 'app:ask_for_description' %}";
                 const keywordsElement = button.parentElement.parentElement.querySelector('.keywords div:first-child');
+                const product = JSON.parse(button.getAttribute('data-product'));
                 const request = {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        ...JSON.parse(button.getAttribute('data-product')),
+                        ...product,
                         keywords: getKeywords(keywordsElement)
                     })
                 };
@@ -240,6 +242,29 @@
                     .then(data => {
                         const descriptionElement = button.parentElement.parentElement.querySelector('.product-description');
                         descriptionElement.innerText = data.description;
+                        const setDescriptionButton = createElement(`
+                            <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
+                        `);
+                        descriptionElement.parentElement.appendChild(setDescriptionButton)
+
+                        setDescriptionButton.addEventListener('click', (e) => {
+                            const undo = buttonToLoading(setDescriptionButton);
+                            const description = setDescriptionButton.parentElement.querySelector('.product-description').innerText;
+                            const setDescriptionUrl = `/salla/write-description/${product.id}/`;
+
+                            fetch(setDescriptionUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ description })
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    cardElement.querySelector('.product-description').innerText = description;
+                                    closePopup();
+                                })
+                                .catch(error => console.log(error))
+                                .finally(() => undo() );
+                        });
                     })
                     .catch(error => console.log(error) )
                     .finally(() => undo() );
@@ -251,8 +276,9 @@
             button.addEventListener('click', () => {
                 const undo = buttonToLoading(button);
                 const url = button.dataset.url;
+                const cardElement = button.parentElement.parentElement;
                 const product = JSON.parse(
-                    button.parentElement.querySelector('[data-product]').dataset.product
+                    cardElement.querySelector('[data-product]').dataset.product
                 );
 
                 openPopup();
@@ -263,9 +289,30 @@
                         const popup = document.getElementById('popup').querySelector('.bg-white');
 
                         popup.querySelector('h2').innerText = product.name;
-                        data.forEach(description => popup.appendChild(
-                            createDescriptionPopupListItem(description)
-                        ))
+                        data.forEach(description => {
+                            const descriptionElement = createDescriptionPopupListItem(description);
+                            popup.appendChild(descriptionElement);
+                            
+                            descriptionElement.querySelector('.set-description').addEventListener('click', (e) => {
+                                const setDescriptionButton = e.target;
+                                const undo = buttonToLoading(setDescriptionButton);
+                                const description = setDescriptionButton.parentElement.firstElementChild.innerText;
+                                const setDescriptionUrl = `/salla/write-description/${product.id}/`;
+
+                                fetch(setDescriptionUrl, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ description })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        cardElement.querySelector('.product-description').innerText = description;
+                                        closePopup();
+                                    })
+                                    .catch(error => console.log(error))
+                                    .finally(() => undo() );
+                            });                        
+                        });
                     })
                     .catch(error => console.log(error))
                     .finally(() => undo() );
