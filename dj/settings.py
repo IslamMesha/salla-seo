@@ -11,10 +11,7 @@ load_dotenv(f'{BASE_DIR}/.env')
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', False) == 'True'
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    '164.90.179.28'
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 INSTALLED_APPS = [
