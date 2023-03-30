@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.decorators import authentication_classes
+from rest_framework.renderers import TemplateHTMLRenderer
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter
 from app.exceptions import SallaOauthFailedException
@@ -19,33 +20,29 @@ from app.serializers import ProductGetDescriptionPOSTBodySerializer
 from app import serializers
 
 
-def get_products() -> list:
-    with open('./debug/3-products-list.json', encoding='utf8') as f:
-        products = json.load(f)
 
-    return products['data']
+class Index(APIView):
+    permission_classes = []
+    renderer_classes = [TemplateHTMLRenderer]
 
+    def get(self, request):
+        app_id = os.environ.get('SALLA_APP_ID')
+        context = {
+            'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
+            'is_authenticated': False,
+        }
 
-def get_pagination() -> dict:
-    with open('./debug/3-products-list.json', encoding='utf8') as f:
-        products = json.load(f)
+        if request.user.is_authenticated and hasattr(request.user, 'account'):
+            products = SallaMerchantReader(request.user.account).get_products(request.GET)
 
-    return products['pagination']
+            context.update({
+                'user': request.user,
+                'products': products['data'],
+                'pagination': products['pagination'],
+                'is_authenticated': True,
+            })
 
-
-@authentication_classes([TokenAuthSupportCookie])
-def index(request):
-    app_id = os.environ.get('SALLA_APP_ID')
-    context = {
-        'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
-        'user': request.user,
-        'products': get_products(),
-        'pagination': get_pagination(),
-        'keywords': []
-    }
-
-    print(request.user.is_authenticated and request.user)
-    return render(request, 'index.html', context=context)
+        return Response(context, template_name='index.html')
 
 
 def oauth_callback(request):
