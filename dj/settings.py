@@ -10,9 +10,10 @@ load_dotenv(f'{BASE_DIR}/.env')
 
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = bool(os.getenv('DEBUG', False))
+DEBUG = os.getenv('DEBUG', False) == 'True'
 ALLOWED_HOSTS = [
     '127.0.0.1',
+    '164.90.179.28'
 ]
 
 # Application definition
@@ -90,6 +91,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = '/static/'
 
 # Default primary key field type
