@@ -11,7 +11,7 @@ from rest_framework.decorators import authentication_classes
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter
-from app.exceptions import SallaOauthFailedException
+from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
 from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
 from app.utils import set_cookie
 from app.enums import CookieKeys
@@ -146,3 +146,16 @@ class ProductListDescriptionsAPI(ListAPIView):
                 .order_by('-id')
         )
 
+
+def exception_handler(exc, context):
+    from rest_framework.views import exception_handler as drf_exception_handler
+
+    auth_exceptions = (SallaOauthFailedException, SallaEndpointFailureException)
+
+    if any([isinstance(exc, e) for e in auth_exceptions]):
+        response = redirect('app:index')
+        response.delete_cookie(CookieKeys.AUTH_TOKEN.value)
+    else:
+        response = drf_exception_handler(exc, context)
+
+    return response
