@@ -1,5 +1,4 @@
 import os
-import json
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -7,16 +6,15 @@ from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework.decorators import authentication_classes
 from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.views import exception_handler as drf_exception_handler
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
 from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
 from app.utils import set_cookie
 from app.enums import CookieKeys
-from app.authentication import TokenAuthSupportCookie
-from app.serializers import ProductGetDescriptionPOSTBodySerializer
 from app import serializers
 
 
@@ -70,7 +68,7 @@ class ProductsListAPI(ListAPIView):
 
 
 class ProductGetDescriptionAPI(APIView):
-    post_body_serializer = ProductGetDescriptionPOSTBodySerializer
+    post_body_serializer = serializers.ProductGetDescriptionPOSTBodySerializer
     prompt_type = ChatGPTProductPromptGenerator.Types.DESCRIPTION
 
     def get_data(self, request) -> dict:
@@ -148,9 +146,10 @@ class ProductListDescriptionsAPI(ListAPIView):
 
 
 def exception_handler(exc, context):
-    from rest_framework.views import exception_handler as drf_exception_handler
-
-    auth_exceptions = (SallaOauthFailedException, SallaEndpointFailureException)
+    auth_exceptions = (
+        SallaOauthFailedException, SallaEndpointFailureException,
+        AuthenticationFailed
+    )
 
     if any([isinstance(exc, e) for e in auth_exceptions]):
         response = redirect('app:index')
