@@ -1,6 +1,8 @@
 import os
 import requests
 
+from django.shortcuts import reverse
+
 from rest_framework.serializers import Serializer
 
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
@@ -10,11 +12,20 @@ from app import utils
 
 
 class SallaOAuth:
-    def __init__(self) -> None:
+    def __init__(self, base_url:str=None) -> None:
         self.app_id = os.environ.get('SALLA_APP_ID')
         self.oauth_client_id = os.environ.get('SALLA_OAUTH_CLIENT_ID')
         self.oauth_client_secret = os.environ.get('SALLA_OAUTH_CLIENT_SECRET')
-        self.redirect_uri = os.environ.get('SALLA_OAUTH_CLIENT_REDIRECT_URI')
+        self.base_url = base_url
+
+    @property
+    def redirect_uri(self):
+        if self.base_url is None:
+            uri = os.environ.get('SALLA_OAUTH_CLIENT_REDIRECT_URI')
+        else:
+            uri = self.base_url.rstrip('/') + reverse('app:oauth_callback')
+
+        return uri
 
     def get_installation_url(self):
         return f'https://s.salla.sa/apps/install/{self.app_id}'

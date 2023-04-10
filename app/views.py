@@ -40,7 +40,9 @@ def oauth_callback(request):
     code = request.GET.get('code')
     if code:
         messages.success(request, 'Login Success.')
-        data = SallaOAuth().get_access_token(code)
+
+        base_url = request.build_absolute_uri('/')
+        data = SallaOAuth(base_url).get_access_token(code)
         account = Account.store(data)
         response = render(request, 'index.html', account.get_homepage_context())
 
