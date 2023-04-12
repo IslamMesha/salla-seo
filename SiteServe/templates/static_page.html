@@ -4,6 +4,8 @@
 
 
 {% block content %}
+
+{% if page.md %}
 <style>
     main{
         
@@ -115,6 +117,7 @@
         border: 1px solid #CCC;
     }
 </style>
+{% endif %}    
 
 {{ page.body|safe }}
 {% endblock content %}
