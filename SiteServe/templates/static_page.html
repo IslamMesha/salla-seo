@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+
+{% block content %}
+<style>
+    main{
+        
+        /*
+        font-family: Georgia, Palatino, serif;
+        max-width: 960px;
+        padding: 30px;
+        
+        */
+        margin: 0 auto;
+        color: #444444;
+        line-height: 1;
+    }
+    main h1, h2, h3, h4 {
+        color: #111111;
+        font-weight: 400;
+    }
+    main h1, h2, h3, h4, h5, p {
+        margin-bottom: 24px;
+        padding: 0;
+    }
+    main h1 {
+        font-size: 48px;
+    }
+    main h2 {
+        font-size: 36px;
+        margin: 24px 0 6px;
+    }
+    main h3 {
+        font-size: 24px;
+    }
+    main h4 {
+        font-size: 21px;
+    }
+    main h5 {
+        font-size: 18px;
+    }
+    main a {
+        color: #0099ff;
+        margin: 0;
+        padding: 0;
+        vertical-align: baseline;
+    }
+    main ul, ol {
+        padding: 0;
+        margin: 0;
+    }
+    main li {
+        line-height: 24px;
+    }
+    main li ul, li ul {
+        margin-left: 24px;
+    }
+    main p, ul, ol {
+        font-size: 16px;
+        line-height: 24px;
+        /*
+        max-width: 540px;
+        */
+    }
+    main pre {
+        padding: 0px 24px;
+        /*
+        max-width: 800px;
+        */
+        white-space: pre-wrap;
+    }
+    main code {
+        font-family: Consolas, Monaco, Andale Mono, monospace;
+        line-height: 1.5;
+        font-size: 13px;
+    }
+    main aside {
+        display: block;
+        float: right;
+        width: 390px;
+    }
+    main blockquote {
+        margin: 1em 2em;
+        /*
+        max-width: 476px;
+        */
+    }
+    main blockquote p {
+        color: #666;
+        /*
+        max-width: 460px;
+        */
+    }
+    main hr {
+        width: 540px;
+        text-align: left;
+        margin: 0 auto 0 0;
+        color: #999;
+    }
+    main table {
+        border-collapse: collapse;
+        margin: 1em 1em;
+        border: 1px solid #CCC;
+    }
+    main table thead {
+        background-color: #EEE;
+    }
+    main table thead td {
+        color: #666;
+    }
+    main table td {
+        padding: 0.5em 1em;
+        border: 1px solid #CCC;
+    }
+</style>
+
+{{ page.body|safe }}
+{% endblock content %}
