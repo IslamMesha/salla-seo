@@ -56,7 +56,7 @@ class StaticPage(models.Model):
     def get_nav_pages(cls):
         from SiteServe.serializers import StaticPageNavPagesSerializer
 
-        qs = cls.objects.filter(is_nav=True).values('nav_name', 'slug')
+        qs = cls.objects.filter(is_nav=True)
         return StaticPageNavPagesSerializer(qs, many=True).data
 
     class Meta:
