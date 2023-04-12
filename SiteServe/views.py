@@ -15,7 +15,10 @@ class LoadStaticPageView(APIView):
 
     def get(self, request, slug):
         page = get_object_or_404(models.StaticPage, slug=slug)
-        context = { 'page': page }
+        context = {
+            'page': page,
+            'nav_pages': models.StaticPage.get_nav_pages()
+        }
 
         return Response(context, template_name='static_page.html')
 

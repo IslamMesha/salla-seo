@@ -24,10 +24,13 @@ class Index(APIView):
     renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request):
+        from SiteServe.models import StaticPage
+
         app_id = os.environ.get('SALLA_APP_ID')
         context = {
             'installation_url': f'https://s.salla.sa/apps/install/{app_id}',
             'is_authenticated': False,
+            'nav_pages': StaticPage.get_nav_pages()
         }
 
         if request.user.is_authenticated and hasattr(request.user, 'account'):
