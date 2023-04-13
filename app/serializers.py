@@ -85,14 +85,14 @@ class ChatGPTResponseSerializer(serializers.Serializer):
 class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     id = serializers.CharField(required=True, write_only=True)
     name = serializers.CharField(required=True, write_only=True)
-    keywords = serializers.ListField(child=serializers.CharField(), default=[])
+    keywords_list = serializers.ListField(child=serializers.CharField(), default=[])
 
     # Those will be used as values in the chatgpt templates
     product_id = serializers.CharField(source='id', read_only=True)
     product_name = serializers.CharField(source='name', read_only=True)
-    keywords_str = serializers.SerializerMethodField(read_only=True)
+    keywords = serializers.SerializerMethodField(read_only=True)
     
-    def get_keywords_str(self, obj):
+    def get_keywords(self, obj):
         return ', '.join(obj['keywords'])
 
 
