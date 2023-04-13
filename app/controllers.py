@@ -136,10 +136,8 @@ class SallaMerchantReader(SallaBaseReader):
 
         return self.get(endpoint, params)
 
-    # TODO delete this method later
-    # because product will be cached
-    def get_product(self, id: str) -> dict:
-        endpoint = '/products/{id}}'
+    def get_product(self, product_id: str) -> dict:
+        endpoint = f'/products/{product_id}'
         return self.get(endpoint)
 
 
@@ -221,26 +219,28 @@ class ChatGPTProductPromptGenerator:
     """Class to generate chatgpt valid prompt from the product data"""
         
     def __init__(self, data: dict) -> None:
+        from SiteServe.models import ChatGPTPromptTemplate
+
+        self.model = ChatGPTPromptTemplate
+
         self.language = utils.get_language(data['product_name'])
-        self.template_name_format = 'product_{type}_{self.language}'
+        self.template_name_format = self.model.NAME_FORMAT
         self.data = data
 
     def __get_template(self, t_type: str) -> str:
         template_name = (
             self.template_name_format
-                .format(type=t_type, self=self)
+                .format(type=t_type, language=self.language)
                 .upper()
         )
-        template = getattr(self.ChatGPTPromptTemplates, template_name, None)
-        assert template is not None, f'No template found for {template_name}'
+        template = self.model.get_template(template_name)
 
+        assert template is not None, f'Template with name `{template_name}` not found.'
         return template
 
     def __get_prompt(self, t_type: str) -> str:
-        # TODO translate template labels into valid python
-        # formatted according to data sent to the class
-        template = self.__get_template(t_type)
-        return template.format(**self.data)
+        template = self.__get_template(t_type).format(**self.data)
+        return template
 
     def ask_for_description(self) -> str:
         _type = self.Types.DESCRIPTION
@@ -251,13 +251,5 @@ class ChatGPTProductPromptGenerator:
         DESCRIPTION = 'description'
         SEO_TITLE = 'seo_title'
 
-    class ChatGPTPromptTemplates:
-        # hold templates for asking chatgpt
-        # NOTE every type should have many languages
-        # NOTE name must follow this format: product_{type}_{language}
-        PRODUCT_DESCRIPTION_EN = 'write a brief about product {product_name}, using these keywords: {keywords_str}'
-        PRODUCT_DESCRIPTION_AR = 'اكتب ملخصاً قصير عن منتج أسمه: {product_name}, باستخدام تلك الكلمات المفتاحية: {keywords_str}'
 
-
-        
 
