@@ -1,4 +1,5 @@
 import time, string, random, langdetect
+from typing import Any, List
 
 
 def next_two_weeks():
@@ -49,3 +50,19 @@ def get_language(text: str) -> str:
         lang = 'en' if cleaned_text[0] in string.ascii_letters else 'ar'
     return lang
 
+def list_to_choices(choices: list) -> list:
+    """Convert a list to a list of choices"""
+    return [(c, c) for c in choices]
+
+
+def readable_list(seq: List[Any], combinator='and') -> str:
+    """Return a grammatically correct human readable string (with an Oxford comma)."""
+    # Ref: https://stackoverflow.com/a/53981846/
+    seq = list(map(str, seq))
+
+    if len(seq) < 3:
+        result = f' {combinator} '.join(seq)
+    else:
+        result = ', '.join(seq[:-1]) + f', {combinator} ' + seq[-1]
+
+    return result
