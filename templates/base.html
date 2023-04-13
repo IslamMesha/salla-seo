@@ -22,11 +22,15 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
+
+        body > div {
+          display: none
+        }
     </style>
 
     <title>{% block title %}My Website{% endblock %} | Salla SEO Plugin</title>
   </head>
-  <body class="p-8 bg-gray-100 select-none m-auto" style="max-width: 80vw">
+  <body class="p-8 bg-gray-100 select-none m-auto flex flex-col justify-between" style="max-width: 80vw; min-height: 100vh">
     <header>
         <h1 class="text-3xl font-bold text-center text-black">Welcome to Salla SEO Plugin.</h1>
       
