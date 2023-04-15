@@ -116,10 +116,7 @@ class Account(models.Model):
 
 
 class SallaStore(models.Model):
-    user = models.OneToOneField(
-        SallaUser, on_delete=models.CASCADE, related_name='store'
-    )
-        
+    user = models.OneToOneField(SallaUser, on_delete=models.CASCADE, related_name='store')
     salla_id = models.CharField(max_length=64, unique=True)
 
     name = models.CharField(max_length=128, blank=True, null=True)
@@ -171,5 +168,19 @@ class UserPrompt(models.Model):
 
     def __str__(self):
         return f'{self.user }: {self.chat_gpt_log.prompt}'
+
+
+class SallaWebhookLog(models.Model):
+    event = models.CharField(max_length=128)
+    merchant_id = models.CharField(max_length=64)
+    data = models.JSONField(default=dict)
+    response = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.event} - {self.merchant_id}'
+
 
 
