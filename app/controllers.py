@@ -6,9 +6,14 @@ from django.shortcuts import reverse
 from rest_framework.serializers import Serializer
 
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
-from app.models import Account, ChatGPTLog
-from app.serializers import ProductEndpointParamsSerializer, ChatGPTResponseSerializer
+from app.models import Account, ChatGPTLog, SallaUser
 from app import utils
+from app.enums import WebhookEvents
+from app.serializers import (
+    ProductEndpointParamsSerializer,
+    ChatGPTResponseSerializer,
+    SallaWebhookLogSerializer
+)
 
 
 class SallaOAuth:
@@ -251,5 +256,64 @@ class ChatGPTProductPromptGenerator:
         DESCRIPTION = 'description'
         SEO_TITLE = 'seo_title'
 
+
+class SallaWebhook:
+    def __init__(self, payload: dict) -> None:
+        self.event = payload['event']
+        self.merchant_id = payload['merchant']
+        self.data = payload['data']
+
+    def __setup(self) -> dict:
+        self.salla_user = self.__get_salla_user()
+        self.events_map = {
+            WebhookEvents.AUTHORIZED.value: self.__authorized,
+            WebhookEvents.SETTINGS_UPDATED.value: self.__settings_updated,
+        }
+        self.event_handler = self.events_map.get(self.event)
+        assert self.event_handler is not None, f'Event `{self.event}` not found.'
+
+    def __get_salla_user(self) -> Account:
+        return SallaUser.objects.filter(merchant__id=self.merchant_id).first()
+
+    def __authorized(self) -> dict:
+        Account.store(self.data)
+        return {'status': 'success'}
+
+    def __settings_updated(self) -> dict:
+        assert self.salla_user is not None, 'Salla user not found.'
+
+        email = self.data.get('email')
+        if email:
+            self.salla_user.email = email
+            self.salla_user.save()
+
+        password = self.data.get('password')
+        if password:
+            self.salla_user.set_password(password)
+
+        return {'status': 'success'}
+
+    def __log_to_db(self, response: dict) -> None:
+        serializer = SallaWebhookLogSerializer(data={
+            'event': self.event,
+            'merchant_id': self.merchant_id,
+            'data': self.data,
+            'response': response,
+        })
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+    def process(self) -> None:
+        try:
+            self.__setup()
+            response = self.event_handler()
+            status_code = 200
+        except Exception as e:
+            response = {'status': 'error', 'message': str(e)}
+            status_code = 400
+        finally:
+            self.__log_to_db(response)
+        
+        return response, status_code
 
 
