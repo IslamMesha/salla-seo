@@ -99,3 +99,12 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
 class ProductUpdatePOSTBodySerializer(serializers.Serializer):
     description = serializers.CharField(required=True)
 
+class SallaWebhookLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SallaWebhookLog
+        fields = '__all__'
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+        }

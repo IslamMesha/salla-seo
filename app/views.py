@@ -10,7 +10,7 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import exception_handler as drf_exception_handler
 
-from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter
+from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter, SallaWebhook
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
 from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
 from app.utils import set_cookie
@@ -148,6 +148,14 @@ class ProductListDescriptionsAPI(ListAPIView):
                 )
                 .order_by('-id')
         )
+
+
+class WebhookAPI(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        response, status_code = SallaWebhook(request.data).process()
+        return Response(response, status=status_code)
 
 
 def exception_handler(exc, context):

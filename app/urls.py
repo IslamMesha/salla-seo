@@ -14,4 +14,6 @@ urlpatterns = [
 
     path('test/', views.Test.as_view(), name='test'),
     path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
+    path('webhook/', views.WebhookAPI.as_view(), name='webhook'),
+    
 ]
