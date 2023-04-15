@@ -180,7 +180,9 @@ class SallaWebhookLog(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.event} - {self.merchant_id}'
+        status = self.response.get('status', 'unknown')
+        emoji = '✅' if status == 'success' else '❌'
+        return f'{emoji} {self.event} - {self.merchant_id}'
 
 
 
