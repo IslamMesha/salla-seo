@@ -1,6 +1,10 @@
 import time, string, random, langdetect
 from typing import Any, List
 
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 
 def next_two_weeks():
     return int(time.time()) + 60 * 60 * 24 * 14
@@ -54,7 +58,6 @@ def list_to_choices(choices: list) -> list:
     """Convert a list to a list of choices"""
     return [(c, c) for c in choices]
 
-
 def readable_list(seq: List[Any], combinator='and') -> str:
     """Return a grammatically correct human readable string (with an Oxford comma)."""
     # Ref: https://stackoverflow.com/a/53981846/
@@ -66,3 +69,15 @@ def readable_list(seq: List[Any], combinator='and') -> str:
         result = ', '.join(seq[:-1]) + f', {combinator} ' + seq[-1]
 
     return result
+
+def validate_email_and_password(email: str, password: str) -> bool:
+    is_valid = True
+    try:
+        validate_email(email)
+        validate_password(password)
+    except ValidationError:
+        is_valid = False
+
+    return is_valid
+
+

@@ -1,4 +1,5 @@
 import os
+import logging
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -7,16 +8,17 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.views import exception_handler as drf_exception_handler
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter, SallaWebhook
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
 from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
-from app.utils import set_cookie
+from app.utils import set_cookie, validate_email_and_password
 from app.enums import CookieKeys
 from app import serializers
 
+logger = logging.getLogger('main')
 
 
 class Index(APIView):
@@ -155,6 +157,34 @@ class WebhookAPI(APIView):
 
     def post(self, request):
         response, status_code = SallaWebhook(request.data).process()
+        return Response(response, status=status_code)
+
+
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+
+
+class SettingsValidationAPI(APIView):
+    permission_classes = []
+
+    def extract_data(self, payload) -> dict:
+        data = payload.get('data') or payload
+        settings = data.get('settings') or data
+
+        return settings.get('email'), settings.get('password')
+
+    def post(self, request):
+        email, password = self.extract_data(request.data)
+
+        if email is None or password is None:
+            logger.error(f'[SETTINGS_VALIDATION]: {request.data}')
+            raise ValidationError({'error': 'Email and password are required.'})
+
+        is_valid = validate_email_and_password(email, password)
+
+        status, status_code = ('success', 200) if is_valid else ('error', 400)
+        response = {'status': status}
+
         return Response(response, status=status_code)
 
 
