@@ -2,6 +2,7 @@ import time
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.hashers import check_password
 
 from app import utils
 from app import managers
@@ -37,6 +38,18 @@ class SallaUser(AbstractBaseUser):
 
         return super().save(*args, **kwargs)
 
+    @classmethod
+    def authenticate(cls, email, password):
+        try:
+            user = cls.objects.get(email=email)
+
+            is_right_password = check_password(password, user.password)
+            user = user if is_right_password else None
+
+        except cls.DoesNotExist:
+            user = None
+
+        return user
 
 class Account(models.Model):
     # Send to frontend to authenticate with
@@ -100,6 +113,7 @@ class Account(models.Model):
 
     def get_homepage_context(self, params: dict ={}) -> dict:
         from app.controllers import SallaMerchantReader
+        from SiteServe.models import StaticPage
 
         products = SallaMerchantReader(self).get_products(params)
         context = {
@@ -107,6 +121,7 @@ class Account(models.Model):
             'products': products['data'],
             'pagination': products['pagination'],
             'is_authenticated': True,
+            'nav_pages': StaticPage.get_nav_pages()
         }
 
         return context
