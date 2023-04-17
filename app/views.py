@@ -41,6 +41,45 @@ class Index(APIView):
         return Response(context, template_name='index.html')
 
 
+class Login(APIView):
+    permission_classes = []
+    renderer_classes = [TemplateHTMLRenderer]
+
+    body_serializer = serializers.LoginPOSTBodySerializer
+
+    def get_data(self, request) -> dict:
+        serializer = self.post_body_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        return data
+
+    def post(self, request):
+        data = self.get_data(request)
+        user = SallaUser.authenticate(**data)
+
+        if user:
+            context = request.user.account.get_homepage_context(request.GET)
+            response = Response(context, template_name='index.html')
+        else:
+            messages.error(request, 'Invalid email or password.')
+            response = redirect('app:index')
+            response.delete_cookie(CookieKeys.AUTH_TOKEN.value)
+
+        return response
+
+
+class Logout(APIView):
+    permission_classes = []
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request):
+        response = redirect('app:index')
+        response.delete_cookie(CookieKeys.AUTH_TOKEN.value)
+
+        return response
+
+
 def oauth_callback(request):
     code = request.GET.get('code')
     if code:
@@ -201,3 +240,4 @@ def exception_handler(exc, context):
         response = drf_exception_handler(exc, context)
 
     return response
+

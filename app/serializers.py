@@ -99,6 +99,12 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
 class ProductUpdatePOSTBodySerializer(serializers.Serializer):
     description = serializers.CharField(required=True)
 
+
+class LoginPOSTBodySerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
+
+
 class SallaWebhookLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SallaWebhookLog
@@ -108,3 +114,5 @@ class SallaWebhookLogSerializer(serializers.ModelSerializer):
             'created_at': {'read_only': True},
             'updated_at': {'read_only': True},
         }
+
+

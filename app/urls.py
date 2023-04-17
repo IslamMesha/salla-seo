@@ -6,6 +6,9 @@ app_name = 'app'
 
 urlpatterns = [
     path('', views.Index.as_view(), name='index'),
+    path('login/', views.Login.as_view(), name='login'),
+    path('Logout/', views.Logout.as_view(), name='logout'),
+
     path('products/', views.ProductsListAPI.as_view(), name='list_products'),
 
     path('ask-gpt/description/', views.ProductGetDescriptionAPI.as_view(), name='ask_for_description'),
