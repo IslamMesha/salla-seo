@@ -41,10 +41,10 @@ class SallaUser(AbstractBaseUser):
     @classmethod
     def authenticate(cls, email, password):
         try:
-            user = cls.objects.get(email=email)
+            user = cls.objects.get(email=email, password=password)
 
-            is_right_password = check_password(password, user.password)
-            user = user if is_right_password else None
+            # is_right_password = check_password(password, user.password)
+            # user = user if is_right_password else None
 
         except cls.DoesNotExist:
             user = None
@@ -115,11 +115,11 @@ class Account(models.Model):
         from app.controllers import SallaMerchantReader
         from SiteServe.models import StaticPage
 
-        products = SallaMerchantReader(self).get_products(params)
+        # products = SallaMerchantReader(self).get_products(params)
         context = {
             'user': self.user,
-            'products': products['data'],
-            'pagination': products['pagination'],
+            # 'products': products['data'],
+            # 'pagination': products['pagination'],
             'is_authenticated': True,
             'nav_pages': StaticPage.get_nav_pages()
         }
