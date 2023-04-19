@@ -9,6 +9,11 @@
         <a class="border-2 px-3 py-1 border-black bg-red-600 text-white font-bold" target="_blank"
             href="{{ installation_url }}">Install the APP</a>
     </div>
+    <form action="{% url 'app:login' %}" method="post">
+        <input type="email" name="email" placeholder="email">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit" value="Login">
+    </form>
     {% else %}
     {% include 'products.html' %}
     {% endif %}
