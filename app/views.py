@@ -45,7 +45,7 @@ class Login(APIView):
     permission_classes = []
     renderer_classes = [TemplateHTMLRenderer]
 
-    body_serializer = serializers.LoginPOSTBodySerializer
+    post_body_serializer = serializers.LoginPOSTBodySerializer
 
     def get_data(self, request) -> dict:
         serializer = self.post_body_serializer(data=request.data)
@@ -59,8 +59,11 @@ class Login(APIView):
         user = SallaUser.authenticate(**data)
 
         if user:
-            context = request.user.account.get_homepage_context(request.GET)
-            response = Response(context, template_name='index.html')
+            response = redirect('app:index')
+
+            month = 60 * 60 * 24 * 30
+            set_cookie(response, CookieKeys.AUTH_TOKEN.value, user.account.public_token, max_age=month)
+
         else:
             messages.error(request, 'Invalid email or password.')
             response = redirect('app:index')
