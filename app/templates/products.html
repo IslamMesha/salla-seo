@@ -44,13 +44,7 @@
     {% endfor %}
 </div>
 
-<style>
-    .current-page {
-        background-color: #1a202c;
-        color: #fff;
-        font-weight: bold;
-      }
-</style>
+
 <nav class="bg-gray-100 px-4 py-3 flex items-center justify-center">
     <ul class="flex space-x-2">
       {% if pagination.currentPage > 1 %}
@@ -78,12 +72,12 @@
   
 
 <!-- Popup container -->
-<div id="popup" class="popup">
+<div id="list-description-log-popup" class="popup">
     <!-- Popup content -->
     <div class="bg-white rounded-lg mx-auto mt-20 p-6" style="width: 70vw;">
         <div class="flex justify-end">
             <button class="text-gray-500 hover:text-gray-700 font-bold text-xl"
-                onclick="closePopup()">&times;</button>
+                onclick="closePopup(listDescriptionLogPopup)">&times;</button>
         </div>
         <h2 class="text-xl font-bold mb-4">Popup</h2>
     </div>
@@ -94,36 +88,6 @@
     const listOldDescriptionsButtons = document.querySelectorAll('button[data-product-id]');
     const deleteKeywordButtons = document.querySelectorAll('.delete-keyword');
     const addKeywordButtons = document.querySelectorAll('.add-keyword');
-
-    function createElement(html) {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        return div.firstElementChild
-    }
-
-    function openPopup() {
-        document.getElementById("popup").style.display = "block";
-    }
-
-    function closePopup(e) {
-        const popup = document.getElementById("popup")
-        popup.style.display = "none";
-        popup.querySelectorAll('.description-item').forEach(elm => elm.remove())
-    }
-
-    function buttonToLoading(button){
-        const oldText = button.innerText;
-        button.innerText = 'Loading...';
-        button.disabled = true;
-        button.classList.add('cursor-not-allowed', 'opacity-50');
-
-        // return undo function
-        return () => {
-            button.innerText = oldText;
-            button.disabled = false;
-            button.classList.remove('cursor-not-allowed', 'opacity-50');
-        }
-    }
 
     function createDeleteKeywordButton(){
         const deleteKeywordButton = document.createElement('span');
@@ -166,11 +130,6 @@
         deleteKeywordButton.addEventListener('click', () => deleteKeywordButton.parentElement.remove());
     }
 
-    function resetTextInputField(textInputField){
-        textInputField.value = '';
-        textInputField.focus();
-    }
-
     function createDescriptionPopupListItem(description){
         const descriptionElement = createElement(`
             <div class="description-item mb-8 pb-5 border-b-2 border-solid">
@@ -203,7 +162,7 @@
                 .then(response => response.json())
                 .then(data => {
                     cardElement.querySelector('.product-description').innerText = description;
-                    closePopup();
+                    closePopup(listDescriptionLogPopup);
                     setDescriptionButton.remove();
                 })
                 .catch(error => console.log(error))
@@ -257,7 +216,7 @@
                 cardElement.querySelector('[data-product]').dataset.product
             );
 
-            openPopup();
+            openPopup(listDescriptionLogPopup);
 
             fetch(url)
                 .then(response => response.json())
@@ -300,9 +259,7 @@
         });
     })
 
-    document.querySelectorAll('*').forEach(element => {
-        element.setAttribute('dir', 'auto')
-    })
+
 </script>
 
     
