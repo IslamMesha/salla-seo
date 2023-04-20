@@ -15,6 +15,12 @@
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap">
     <title>{% block title %}My Website{% endblock %} | Salla SEO Plugin</title>
 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% if page.md %}
     <link rel="stylesheet" href="{% static 'css/md.css' %}">
@@ -50,23 +56,11 @@
         {% endif %}
       </div>
     </header>
-    
-    {% comment %} {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
-            {{ message }}
-            </li>
-            {% endfor %}
-    </ul>
-    {% endif %} {% endcomment %}
 
     <main class="container mx-auto">
       {% block content %}{% endblock %}
     </main>
 
-    <!-- POP-UPS -->
     {% include 'popups.html' %}
 
     <footer class="bg-gray-900 py-4 mt-12">
