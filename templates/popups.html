@@ -1,0 +1,70 @@
+<!-- Popup container -->
+<div id="list-description-log-popup" class="popup">
+  <!-- Popup content -->
+  <div class="bg-white rounded-lg mx-auto mt-20 p-6" style="width: 70vw">
+    <div class="flex justify-end">
+      <button
+        class="text-gray-500 hover:text-gray-700 font-bold text-xl"
+        onclick="closePopup(listDescriptionLogPopup)"
+      >
+        &times;
+      </button>
+    </div>
+    <h2 class="text-xl font-bold mb-4">Popup</h2>
+  </div>
+</div>
+
+<!-- Popup container -->
+<div id="login-popup" class="popup">
+  <!-- Popup content -->
+  <div class="bg-white rounded-lg mx-auto mt-20 p-6" style="max-width: 400px">
+    <div class="flex justify-end">
+      <button
+        class="text-gray-500 hover:text-gray-700 font-bold text-xl"
+        onclick="closePopup(loginPopupId)"
+      >
+        &times;
+      </button>
+    </div>
+    <h2 class="text-xl font-bold mb-4">Login</h2>
+
+    <form
+      class="bg-white rounded pt-6 pb-8 mb-4"
+      action="{% url 'app:login' %}"
+      method="post"
+    >
+      <div class="mb-4">
+        <label class="block text-gray-700 font-bold mb-2" for="email">
+          Email
+        </label>
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          id="email"
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+        />
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 font-bold mb-2" for="password">
+          Password
+        </label>
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          id="password"
+          type="password"
+          name="password"
+          placeholder="Enter your password"
+        />
+      </div>
+      <div class="flex items-center justify-between">
+        <button
+          class="w-full bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          type="submit"
+        >
+          Sign In
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
