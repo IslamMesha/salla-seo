@@ -28,7 +28,7 @@
         </a>
         {% if nav_pages %}
         <nav>
-          <ul class="flex space-x-reverse space-x-4">
+          <ul class="flex space-x-4">
             <li><a href="/" class="text-gray-300 hover:text-white whitespace-nowrap">الرئيسية</a></li>
             {% for page in nav_pages %}
             <li><a href="{{ page.url }}" class="text-gray-300 hover:text-white whitespace-nowrap">{{ page.nav_name }}</a></li>
