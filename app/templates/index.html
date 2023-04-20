@@ -5,10 +5,6 @@
 
 {% block content %}
     {% if not is_authenticated %}
-    <div class="text-center mt-10">
-        <a class="border-2 px-3 py-1 border-black bg-red-600 text-white font-bold" target="_blank"
-            href="{{ installation_url }}">Install the APP</a>
-    </div>
     <form action="{% url 'app:login' %}" method="post">
         <input type="email" name="email" placeholder="email">
         <input type="password" name="password" placeholder="password">
