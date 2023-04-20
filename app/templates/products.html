@@ -1,265 +1,110 @@
-{% load custom_filters %}
+{% load custom_filters %} {% load static %}
 
 <div class="products pt-12 flex flex-wrap">
-    {% for product in products %}
-    <div class="product bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col">
-        <div class="product-image">
-            <img class="block w-full" src="{{ product.main_image }}" alt="Product Image">
-        </div>
-        <div class="product-info px-4 py-5">
-            <h3 class="product-title font-bold mb-2">{{ product.name }}</h3>
-            <p class="product-description text-sm break-all">{{ product.description }}</p>
-            {% comment %} <p class="product-price text-right">{{ product.price.amount }} {{ product.price.currency }}</p> {% endcomment %}
-        </div>
-
-        <div class="keywords px-4 py-5" style="font-size: 0;">
-            <div>
-                {% for keyword in keywords %}
-                <span class="keyword text-sm text-center px-1 py-1 bg-yellow-300 rounded font-bold mr-1 mb-1 inline-block">
-                    {{ keyword }}<!--
-                    --><span class="delete-keyword rounded inline-block text-white font-bold bg-red-500 w-4 text-center ml-1">&times;</span>
-                </span>
-                {% endfor %}
-            </div>
-
-            <div class="flex rounded mt-2 overflow-hidden">
-                <input type="text"
-                    class="border-2 border-solid border-gray-300 w-full p-1 text-sm flex-grow outline-none"
-                    placeholder="Add a keyword">
-                <button class="add-keyword text-sm py-1 px-2 font-bold text-white bg-blue-500 hover:bg-blue-700 flex-shrink-0 flex-grow-0">Add</button>
-            </div>
-
-        </div>
-
-        <div class="bottom-0 flex-grow flex flex-col-reverse">
-            <button class="block bg-blue-500 hover:bg-blue-700 w-full font-bold text-white py-2 bottom-0"
-                data-product-id="{{ product.id }}" data-url="{% url 'app:list_descriptions' product.id %}">
-                List Old Descriptions
-            </button>
-
-            <button class="block bg-red-500 hover:bg-red-700 w-full font-bold text-white py-2 bottom-0"
-                data-product="{{ product|to_json }}">Get Description</button>
-        </div>
+  {% for product in products %}
+  <div
+    class="product bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
+  >
+    <div class="product-image">
+      <img
+        class="block w-full"
+        src="{{ product.main_image }}"
+        alt="Product Image"
+      />
     </div>
-    {% endfor %}
-</div>
+    <div class="product-info px-4 py-5">
+      <h3 class="product-title font-bold mb-2">{{ product.name }}</h3>
+      <p class="product-description text-sm break-all">
+        {{ product.description }}
+      </p>
+      {% comment %}
+      <p class="product-price text-right">
+        {{ product.price.amount }} {{ product.price.currency }}
+      </p>
+      {% endcomment %}
+    </div>
 
+    <div class="keywords px-4 py-5" style="font-size: 0">
+      <div>
+        {% for keyword in keywords %}
+        <span
+          class="keyword text-sm text-center px-1 py-1 bg-yellow-300 rounded font-bold mr-1 mb-1 inline-block"
+        >
+          {{ keyword }}<!--
+                    --><span
+            class="delete-keyword rounded inline-block text-white font-bold bg-red-500 w-4 text-center ml-1"
+            >&times;</span
+          >
+        </span>
+        {% endfor %}
+      </div>
+
+      <div class="flex rounded mt-2 overflow-hidden">
+        <input
+          type="text"
+          class="border-2 border-solid border-gray-300 w-full p-1 text-sm flex-grow outline-none"
+          placeholder="Add a keyword"
+        />
+        <button
+          class="add-keyword text-sm py-1 px-2 font-bold text-white bg-blue-500 hover:bg-blue-700 flex-shrink-0 flex-grow-0"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-0 flex-grow flex flex-col-reverse">
+      <button
+        class="block bg-blue-500 hover:bg-blue-700 w-full font-bold text-white py-2 bottom-0"
+        data-product-id="{{ product.id }}"
+        data-url="{% url 'app:list_descriptions' product.id %}"
+      >
+        List Old Descriptions
+      </button>
+
+      <button
+        class="block bg-red-500 hover:bg-red-700 w-full font-bold text-white py-2 bottom-0"
+        data-product="{{ product|to_json }}"
+      >
+        Get Description
+      </button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 
 <nav class="bg-gray-100 px-4 py-3 flex items-center justify-center">
-    <ul class="flex space-x-2">
-      {% if pagination.currentPage > 1 %}
-      <li>
-        <a href="?page={{ pagination.currentPage|minus }}" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded">
-            {{ pagination.currentPage|minus }}
-        </a>
-      </li>
-      {% endif %}
+  <ul class="flex space-x-2">
+    {% if pagination.currentPage > 1 %}
+    <li>
+      <a
+        href="?page={{ pagination.currentPage|minus }}"
+        class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded"
+      >
+        {{ pagination.currentPage|minus }}
+      </a>
+    </li>
+    {% endif %}
 
-      <li>
-        <a href="?page={{ pagination.currentPage }}" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded current-page">
-            {{ pagination.currentPage }}
-        </a>
-      </li>
-      {% if pagination.currentPage < pagination.totalPages %}
-      <li>
-        <a href="?page={{ pagination.currentPage|plus }}" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded">
-            {{ pagination.currentPage|plus }}
-        </a>
-      </li>
-      {% endif %}
-    </ul>
-  </nav>
-  
+    <li>
+      <a
+        href="?page={{ pagination.currentPage }}"
+        class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded current-page"
+      >
+        {{ pagination.currentPage }}
+      </a>
+    </li>
+    {% if pagination.currentPage < pagination.totalPages %}
+    <li>
+      <a
+        href="?page={{ pagination.currentPage|plus }}"
+        class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded"
+      >
+        {{ pagination.currentPage|plus }}
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
 
-<!-- Popup container -->
-<div id="list-description-log-popup" class="popup">
-    <!-- Popup content -->
-    <div class="bg-white rounded-lg mx-auto mt-20 p-6" style="width: 70vw;">
-        <div class="flex justify-end">
-            <button class="text-gray-500 hover:text-gray-700 font-bold text-xl"
-                onclick="closePopup(listDescriptionLogPopup)">&times;</button>
-        </div>
-        <h2 class="text-xl font-bold mb-4">Popup</h2>
-    </div>
-</div>
-
-<script>
-    const getDescriptionButtons = document.querySelectorAll('button[data-product]');
-    const listOldDescriptionsButtons = document.querySelectorAll('button[data-product-id]');
-    const deleteKeywordButtons = document.querySelectorAll('.delete-keyword');
-    const addKeywordButtons = document.querySelectorAll('.add-keyword');
-
-    function createDeleteKeywordButton(){
-        const deleteKeywordButton = document.createElement('span');
-        const classes = [
-            'delete-keyword', 'rounded', 'inline-block', 'text-white', 'font-bold', 
-            'bg-red-500', 'hover:bg-red-700', 'cursor-pointer','w-4', 'text-center', 'ml-1'
-        ];
-
-        deleteKeywordButton.classList.add(...classes);
-        deleteKeywordButton.innerHTML = '&times;';
-
-        return deleteKeywordButton;
-    }
-
-    function createKeywordElement(keyword) {
-        const keywordElement = document.createElement('span');
-        const classes = [
-            'keyword', 'text-sm', 'text-center', 'px-1', 'py-1', 'bg-yellow-300',
-            'rounded', 'font-bold', 'mr-1', 'mb-1', 'inline-block',
-        ]
-
-        keywordElement.classList.add(...classes);
-        keywordElement.innerText = keyword;
-
-        return keywordElement;
-    }
-
-    function getKeywords(keywordsElement){
-        return Array.from(
-            keywordsElement.querySelectorAll('.keyword')
-        ).map(keyword => keyword.firstChild.textContent.trim())
-    }
-
-    function addKeyword(keyword, keywordsElement){
-        const keywordElement = createKeywordElement(keyword);
-        const deleteKeywordButton = createDeleteKeywordButton();
-        keywordElement.appendChild(deleteKeywordButton);
-        keywordsElement.appendChild(keywordElement);
-
-        deleteKeywordButton.addEventListener('click', () => deleteKeywordButton.parentElement.remove());
-    }
-
-    function createDescriptionPopupListItem(description){
-        const descriptionElement = createElement(`
-            <div class="description-item mb-8 pb-5 border-b-2 border-solid">
-                <span>${description.chat_gpt_log.answer}</span>
-                <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
-            </div>
-        `);
-
-        if (description.meta.keywords_str){
-            const keywordsElement = document.createElement('span');
-
-            keywordsElement.innerText = description.meta.keywords_str;
-            keywordsElement.classList.add('text-gray-500', 'text-sm', 'block', 'font-bold', 'flex', 'flex-row-reverse', 'mt-3');
-            descriptionElement.appendChild(keywordsElement);
-        }
-
-        return descriptionElement;
-    }
-
-    function addEventToSetDescriptionButton(setDescriptionButton, description, productId, cardElement){
-        setDescriptionButton.addEventListener('click', () => {
-            const undo = buttonToLoading(setDescriptionButton);
-            const setDescriptionUrl = `/salla/write-description/${productId}/`;
-
-            fetch(setDescriptionUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ description })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    cardElement.querySelector('.product-description').innerText = description;
-                    closePopup(listDescriptionLogPopup);
-                    setDescriptionButton.remove();
-                })
-                .catch(error => console.log(error))
-                .finally(() => undo() );
-        });
-    }
-
-
-    getDescriptionButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const undo = buttonToLoading(button);
-            const cardElement = button.parentElement.parentElement;
-            const url = "{% url 'app:ask_for_description' %}";
-            const keywordsElement = cardElement.querySelector('.keywords div:first-child');
-            const product = JSON.parse(button.getAttribute('data-product'));
-            const request = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...product,
-                    keywords_list: getKeywords(keywordsElement)
-                })
-            };
-
-            fetch(url, request)
-                .then(response => response.json())
-                .then(data => {
-                    const descriptionElement = cardElement.querySelector('.product-description');
-                    const setDescriptionButton = createElement(`
-                        <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
-                    `);
-                    const description = data.description;
-
-                    descriptionElement.innerText = data.description;
-                    descriptionElement.parentElement.appendChild(setDescriptionButton)
-
-                    addEventToSetDescriptionButton(setDescriptionButton, description, product.id, cardElement);
-                })
-                .catch(error => console.log(error) )
-                .finally(() => undo() );
-
-        });
-    });
-
-    listOldDescriptionsButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const undo = buttonToLoading(button);
-            const url = button.dataset.url;
-            const cardElement = button.parentElement.parentElement;
-            const product = JSON.parse(
-                cardElement.querySelector('[data-product]').dataset.product
-            );
-
-            openPopup(listDescriptionLogPopup);
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    const popup = document.getElementById('popup').querySelector('.bg-white');
-
-                    popup.querySelector('h2').innerText = product.name;
-                    data.forEach(description => {
-                        const descriptionElement = createDescriptionPopupListItem(description);
-                        const setDescriptionButton = descriptionElement.querySelector('.set-description');
-                        const descriptionText = setDescriptionButton.parentElement.firstElementChild.innerText;
-
-                        popup.appendChild(descriptionElement);
-                        addEventToSetDescriptionButton(setDescriptionButton, descriptionText, product.id, cardElement);                        
-                    });
-                })
-                .catch(error => console.log(error))
-                .finally(() => undo() );
-        });
-    });
-
-    deleteKeywordButtons.forEach(button =>
-        button.addEventListener('click', () => button.parentElement.remove())
-    )
-
-    addKeywordButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const inputField = button.previousElementSibling;
-            const keyword = inputField.value;
-            const keywordsElement = button.parentElement.parentElement.parentElement.querySelector('.keywords div:first-child');
-            const keywordsArray = getKeywords(keywordsElement);
-
-            if (keywordsArray.includes(keyword)) {
-                resetTextInputField(inputField);
-                return;
-            }
-
-            addKeyword(keyword, keywordsElement);
-            resetTextInputField(inputField);
-        });
-    })
-
-
-</script>
-
-    
+<script src="{% static 'js/products.js' %}"></script>
