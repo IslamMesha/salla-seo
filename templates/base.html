@@ -1,3 +1,6 @@
+{% load static %}
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
         integrity="sha512-wnea99uKIC3TJF7v4eKk4Y+lMz2Mklv18+r4na2Gn1abDRPPOeef95xTzdwGD9e6zXJBteMIhZ1+68QC5byJZw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap">
 
     <style>
         /* Style the popup container */
@@ -26,27 +31,54 @@
         body > div {
           display: none
         }
+
+        body {
+          font-family: 'Cairo', sans-serif;
+        }
+
+        .bg-orange-500 {
+          background-color: #f7941d;
+        }
+
+        .bg-orange-500:hover {
+          background-color: #e28819;
+        }
+       
     </style>
 
     <title>{% block title %}My Website{% endblock %} | Salla SEO Plugin</title>
   </head>
-  <body class="p-8 bg-gray-100 select-none m-auto flex flex-col justify-between" style="max-width: 80vw; min-height: 100vh">
-    <header>
-        <h1 class="text-3xl font-bold text-center text-black">Welcome to Salla SEO Plugin.</h1>
-      
-      {% if nav_pages %}
+  <body class="bg-gray-100 select-none m-auto flex flex-col justify-between" style="min-height: 100vh">
+    <header class="bg-gray-900 py-4">
+      <div class="container mx-auto flex items-center justify-between">
+        <a href="/">
+          <img src="{% static 'images/logo.png' %}" alt="logo" class="h-16">
+        </a>
+        {% if nav_pages %}
         <nav>
-        <ul>
+          <ul class="flex space-x-4">
+            <li><a href="/" class="text-gray-300 hover:text-white">Home</a></li>
             {% for page in nav_pages %}
-            <li><a href="{{ page.url }}">{{ page.nav_name }}</a></li>
+            <li><a href="{{ page.url }}" class="text-gray-300 hover:text-white">{{ page.nav_name }}</a></li>
             {% endfor %}
-        </ul>
-        </nav>
-        
-      {% endif %}
-        
-    </header>
 
+            {% if is_authenticated %}
+            <li><a href="{% url 'app:logout' %}" class="text-gray-300 hover:text-white">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'app:login' %}" class="text-gray-300 hover:text-white">Login</a></li>
+            <li>
+              <a href="{{ installation_url }}" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded" target="_blank">
+                Install In Salla
+              </a>
+            </li>
+            {% endif %}
+
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </header>
+    
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
@@ -58,13 +90,16 @@
     </ul>
     {% endif %}
 
-    <main>
+    <main class="container mx-auto">
       {% block content %}
       {% endblock %}
     </main>
 
-    <footer>
-      <p>&copy; 2023 My Website</p>
+    <footer class="bg-gray-900 py-4 mt-12">
+      <div class="container mx-auto text-center text-gray-300">
+        &copy; 2023 Salla SEO Plugin. All Rights Reserved.
+      </div>
     </footer>
+    
   </body>
 </html>
