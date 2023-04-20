@@ -44,24 +44,38 @@
     {% endfor %}
 </div>
 
-<div class="pagination flex flex-wrap justify-center">
-    {% if pagination.currentPage > 1 %}
-    <div class="current page border-2 border-black w-14 flex-grow-0 text-center">
-        <a class="font-bold text-5xl w-full block"
-            href="?page={{ pagination.currentPage|minus }}">{{ pagination.currentPage|minus }}</a>
-    </div>
-    {% endif %}
-    <div class="current page border-2 border-black w-14 flex-grow-0 text-center bg-red-200">
-        <a class="font-bold text-5xl w-full block"
-            href="?page={{ pagination.currentPage }}">{{ pagination.currentPage }}</a>
-    </div>
-    {% if pagination.currentPage < pagination.totalPages %}
-    <div class="current page border-2 border-black w-14 flex-grow-0 text-center">
-        <a class="font-bold text-5xl w-full block"
-            href="?page={{ pagination.currentPage|plus }}">{{ pagination.currentPage|plus }}</a>
-    </div>
-    {% endif %}
-</div>
+<style>
+    .current-page {
+        background-color: #1a202c;
+        color: #fff;
+        font-weight: bold;
+      }
+</style>
+<nav class="bg-gray-100 px-4 py-3 flex items-center justify-center">
+    <ul class="flex space-x-2">
+      {% if pagination.currentPage > 1 %}
+      <li>
+        <a href="?page={{ pagination.currentPage|minus }}" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded">
+            {{ pagination.currentPage|minus }}
+        </a>
+      </li>
+      {% endif %}
+
+      <li>
+        <a href="?page={{ pagination.currentPage }}" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded current-page">
+            {{ pagination.currentPage }}
+        </a>
+      </li>
+      {% if pagination.currentPage < pagination.totalPages %}
+      <li>
+        <a href="?page={{ pagination.currentPage|plus }}" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded">
+            {{ pagination.currentPage|plus }}
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  
 
 <!-- Popup container -->
 <div id="popup" class="popup">
