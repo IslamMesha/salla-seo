@@ -49,11 +49,17 @@
       <h3 class="font-bold mb-2">معلومات المنتج</h3>
 
       <div>
-        <label class="text-gray-400 font-bold text-xs" for="">اسم المنتج</label>
+        <label class="text-gray-400 font-bold mb-2 text-xs">اسم المنتج</label>
+        <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
+        <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
+
         <p class="product-seo-title break-all mb-3">{{ product.name }}</p>
       </div>
       <div>
-        <label class="text-gray-400 font-bold text-xs" for="">وصف المنتج</label>
+        <label class="text-gray-400 font-bold mb-2 text-xs">وصف المنتج</label>
+        <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
+        <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
+
         <p class="product-description text-sm break-all">
           {{ product.description }}
         </p>
@@ -63,13 +69,19 @@
       <h3 class="font-bold mb-2">معلومات السيو</h3>
 
       <div>
-        <label class="text-gray-400 font-bold text-xs" for="">عنوان السيو (الخاص بمحرك البحث)</label>
+        <label class="text-gray-400 font-bold mb-2 text-xs">عنوان السيو (الخاص بمحرك البحث)</label>
+        <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
+        <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
+
         <p class="product-seo-title break-all mb-3">
           {% if product.metadata.title %} {{ product.metadata.title }} {% else %} غير معرف {% endif %}
         </p>
       </div>
       <div>
-        <label class="text-gray-400 font-bold text-xs" for="">وصف السيو (الخاص بمحرك البحث)</label>
+        <label class="text-gray-400 font-bold mb-2 text-xs">وصف السيو (الخاص بمحرك البحث)</label>
+        <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
+        <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
+
         <p class="product-seo-description break-all">
           {% if product.metadata.description %} {{ product.metadata.description}} 
           {% else %} غير معرف {% endif %}
