@@ -1,27 +1,80 @@
 {% load custom_filters %} {% load static %}
 
+
+<!-- <i class="fas fa-clock text-blue-800"></i> -->
+
 <div class="products pt-12 flex flex-wrap">
   {% for product in products %}
   <div
-    class="product bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
+    class="product overflow-hidden shadow-md bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
   >
-    <div class="product-image">
+    <div
+      id="product-{{ forloop.counter }}"
+      class="product-image image-container"
+    >
       <img
-        class="block w-full"
+        class="block m-auto h-80 object-cover relative"
         src="{{ product.main_image }}"
         alt="Product Image"
       />
+
+      <style>
+        #product-{{ forloop.counter }} {
+          position: relative;
+          width: 100%;
+          display: flex;
+          overflow: hidden;
+        }
+
+        #product-{{ forloop.counter }}:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-image: url({{ product.main_image }});
+          background-size: cover;
+          filter: blur(8px);
+          z-index: 0;
+          background-position: center;
+          transform: scale(1.3);
+        }
+        #product-{{ forloop.counter }} img {
+          height: 85%;
+        }
+      </style>
     </div>
     <div class="product-info px-4 py-5">
-      <h3 class="product-title font-bold mb-2">{{ product.name }}</h3>
-      <p class="product-description text-sm break-all">
-        {{ product.description }}
-      </p>
-      {% comment %}
-      <p class="product-price text-right">
-        {{ product.price.amount }} {{ product.price.currency }}
-      </p>
-      {% endcomment %}
+      <h3 class="font-bold mb-2">معلومات المنتج</h3>
+
+      <div>
+        <label class="text-gray-400 font-bold text-xs" for="">اسم المنتج</label>
+        <p class="product-seo-title break-all mb-3">{{ product.name }}</p>
+      </div>
+      <div>
+        <label class="text-gray-400 font-bold text-xs" for="">وصف المنتج</label>
+        <p class="product-description text-sm break-all">
+          {{ product.description }}
+        </p>
+      </div>
+    </div>
+    <div class="product-seo-info px-4">
+      <h3 class="font-bold mb-2">معلومات السيو</h3>
+
+      <div>
+        <label class="text-gray-400 font-bold text-xs" for="">عنوان السيو (الخاص بمحرك البحث)</label>
+        <p class="product-seo-title break-all mb-3">
+          {% if product.metadata.title %} {{ product.metadata.title }} {% else %} غير معرف {% endif %}
+        </p>
+      </div>
+      <div>
+        <label class="text-gray-400 font-bold text-xs" for="">وصف السيو (الخاص بمحرك البحث)</label>
+        <p class="product-seo-description break-all">
+          {% if product.metadata.description %} {{ product.metadata.description}} 
+          {% else %} غير معرف {% endif %}
+        </p>
+      </div>
     </div>
 
     <div class="keywords px-4 py-5" style="font-size: 0">
