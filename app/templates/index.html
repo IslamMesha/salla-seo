@@ -5,11 +5,7 @@
 
 {% block content %}
     {% if not is_authenticated %}
-    <form action="{% url 'app:login' %}" method="post">
-        <input type="email" name="email" placeholder="email">
-        <input type="password" name="password" placeholder="password">
-        <input type="submit" value="Login">
-    </form>
+    <h1 class="text-4xl font-bold text-center text-capitalize">This is Landing page</h1>
     {% else %}
     {% include 'products.html' %}
     {% endif %}
