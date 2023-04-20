@@ -115,3 +115,5 @@ cython_debug/
 .history
 
 debug/*
+static/admin/
+static/rest_framework/
