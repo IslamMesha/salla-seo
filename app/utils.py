@@ -80,4 +80,13 @@ def validate_email_and_password(email: str, password: str) -> bool:
 
     return is_valid
 
+def get_static_products():
+    import json
+    with open('./debug/3-products-list.json', 'r') as f:
+        json_data = json.loads(f.read())
+
+    return {
+        'products': json_data['data'][:3],
+        'pagination': json_data['pagination'],
+    }
 
