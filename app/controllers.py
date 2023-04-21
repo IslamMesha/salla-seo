@@ -204,7 +204,7 @@ class ChatGPT:
 
     def ask(self, prompt: str) -> ChatGPTLog:
         openai_model = os.getenv('OPENAI_MODEL', 'text-davinci-003')
-        openai_max_token = int(os.getenv('OPENAI_MAX_TOKEN', 256))
+        openai_max_token = int(os.getenv('OPENAI_MAX_TOKEN', 512))
 
         response = self.openai.Completion.create(
             model=openai_model,
@@ -231,11 +231,12 @@ class ChatGPTProductPromptGenerator:
         self.language = utils.get_language(data['product_name'])
         self.template_name_format = self.model.NAME_FORMAT
         self.data = data
+        self._type = data['prompt_type']
 
-    def __get_template(self, t_type: str) -> str:
+    def __get_template(self) -> str:
         template_name = (
             self.template_name_format
-                .format(type=t_type, language=self.language)
+                .format(type=self._type, language=self.language)
                 .upper()
         )
         template = self.model.get_template(template_name)
@@ -243,26 +244,9 @@ class ChatGPTProductPromptGenerator:
         assert template is not None, f'Template with name `{template_name}` not found.'
         return template
 
-    def __get_prompt(self, t_type: str) -> str:
-        template = self.__get_template(t_type).format(**self.data)
+    def get_prompt(self) -> str:
+        template = self.__get_template().format(**self.data)
         return template
-
-    def ask_for_title(self) -> str:
-        _type = self.Types.TITLE
-        return self.__get_prompt(_type)
-
-    def ask_for_description(self) -> str:
-        _type = self.Types.DESCRIPTION
-        return self.__get_prompt(_type)
-
-    def ask_for_seo_title(self) -> str:
-        _type = self.Types.SEO_TITLE
-        return self.__get_prompt(_type)
-
-    def ask_for_seo_description(self) -> str:
-        _type = self.Types.SEO_DESCRIPTION
-        return self.__get_prompt(_type)
-
 
     class Types:
         TITLE = 'title'
