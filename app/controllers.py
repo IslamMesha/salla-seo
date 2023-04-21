@@ -247,14 +247,28 @@ class ChatGPTProductPromptGenerator:
         template = self.__get_template(t_type).format(**self.data)
         return template
 
+    def ask_for_title(self) -> str:
+        _type = self.Types.TITLE
+        return self.__get_prompt(_type)
+
     def ask_for_description(self) -> str:
         _type = self.Types.DESCRIPTION
         return self.__get_prompt(_type)
 
+    def ask_for_seo_title(self) -> str:
+        _type = self.Types.SEO_TITLE
+        return self.__get_prompt(_type)
+
+    def ask_for_seo_description(self) -> str:
+        _type = self.Types.SEO_DESCRIPTION
+        return self.__get_prompt(_type)
+
 
     class Types:
+        TITLE = 'title'
         DESCRIPTION = 'description'
         SEO_TITLE = 'seo_title'
+        SEO_DESCRIPTION = 'seo_description'
 
 
 class SallaWebhook:
