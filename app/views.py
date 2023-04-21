@@ -117,14 +117,8 @@ class ProductsListAPI(ListAPIView):
         return Response(products)
 
 
-class ProductGetDescriptionAPI(APIView):
+class AskGPTAboutProductAPI(APIView):
     post_body_serializer = serializers.ProductGetDescriptionPOSTBodySerializer
-    prompt_types = {
-        'title': ChatGPTProductPromptGenerator.Types.TITLE,
-        'description': ChatGPTProductPromptGenerator.Types.DESCRIPTION,
-        'seo_title': ChatGPTProductPromptGenerator.Types.SEO_TITLE,
-        'seo_description': ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION,
-    }
 
     def get_data(self, request) -> dict:
         serializer = self.post_body_serializer(data=request.data)
@@ -170,13 +164,6 @@ class ProductListHistoryAPI(ListAPIView):
     serializer_class = serializers.UserPromptSerializer
     post_body_serializer = serializers.ProductListHistoryPOSTBodySerializer
 
-    prompt_types = {
-        'title': ChatGPTProductPromptGenerator.Types.TITLE,
-        'description': ChatGPTProductPromptGenerator.Types.DESCRIPTION,
-        'seo_title': ChatGPTProductPromptGenerator.Types.SEO_TITLE,
-        'seo_description': ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION,
-    }
-
     def get_data(self, request) -> dict:
         serializer = self.post_body_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -187,8 +174,7 @@ class ProductListHistoryAPI(ListAPIView):
     def get_queryset(self):
         data = self.get_data(self.request)
         product_id = data['product_id']
-        prompt_type = self.prompt_types.get(data['prompt_type'])
-        assert prompt_type, 'Invalid prompt type'
+        prompt_type = data['prompt_type']
 
         qs = (
             self.request.user.prompts
