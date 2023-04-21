@@ -221,6 +221,14 @@ productIcons.forEach((icon) => {
             descriptionText,
           );
         });
+        if (data.length === 0) {
+          const noDescriptionElement = createElement(`
+                    <div class="description-item text-center text-capitalize text-3xl text-gray-400 font-bold">
+                        <span>No history found</span>
+                    </div>
+                `);
+          popup.appendChild(noDescriptionElement);
+        }
       })
       .catch((error) => console.log(error))
       .finally(() => icon.classList.remove('opacity-50'));
