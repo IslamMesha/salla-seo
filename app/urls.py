@@ -12,7 +12,7 @@ urlpatterns = [
     path('products/', views.ProductsListAPI.as_view(), name='list_products'),
 
     path('ask-gpt/', views.AskGPTAboutProductAPI.as_view(), name='ask_gpt'),
-    path('salla/write-description/<str:product_id>/', views.ProductUpdateAPI.as_view(), name='update_descriptions'),
+    path('salla/submit/', views.SubmitToSallaAPI.as_view(), name='submit_to_salla'),
     path('product/history/', views.ProductListHistoryAPI.as_view(), name='product_history'),
 
     path('test/', views.Test.as_view(), name='test'),
