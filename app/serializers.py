@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from app import models
+from SiteServe.models import CHATGPT_PROMPT_TYPES
 
 
 class SallaUserSerializer(serializers.ModelSerializer):
@@ -85,22 +86,18 @@ class ChatGPTResponseSerializer(serializers.Serializer):
 class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     id = serializers.CharField(required=True, write_only=True)
     name = serializers.CharField(required=True, write_only=True)
-    keywords_list = serializers.ListField(child=serializers.CharField(), default=[])
 
     # Those will be used as values in the chatgpt templates
     product_id = serializers.CharField(source='id', read_only=True)
     product_name = serializers.CharField(source='name', read_only=True)
-    keywords = serializers.SerializerMethodField(read_only=True)
+    keywords = serializers.CharField(required=False)
 
-    prompt_type = serializers.ChoiceField(required=True, choices=['title', 'description','seo_title','seo_description'])
-
-    def get_keywords(self, obj):
-        return ', '.join(obj['keywords'])
+    prompt_type = serializers.ChoiceField(required=True, choices=CHATGPT_PROMPT_TYPES(is_2d=False))
 
 
 class ProductListHistoryPOSTBodySerializer(serializers.Serializer):
     product_id = serializers.CharField(required=True)
-    prompt_type = serializers.ChoiceField(required=True, choices=['title', 'description','seo_title','seo_description'])
+    prompt_type = serializers.ChoiceField(required=True, choices=CHATGPT_PROMPT_TYPES(is_2d=False))
 
 
 class ProductUpdatePOSTBodySerializer(serializers.Serializer):
