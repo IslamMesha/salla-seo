@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.views import exception_handler as drf_exception_handler
+from rest_framework.exceptions import MethodNotAllowed
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter, SallaWebhook
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
@@ -119,6 +120,12 @@ class ProductsListAPI(ListAPIView):
 class ProductGetDescriptionAPI(APIView):
     post_body_serializer = serializers.ProductGetDescriptionPOSTBodySerializer
     prompt_type = ChatGPTProductPromptGenerator.Types.DESCRIPTION
+    prompt_types = {
+        'title': ChatGPTProductPromptGenerator.Types.TITLE,
+        'description': ChatGPTProductPromptGenerator.Types.DESCRIPTION,
+        'seo_title': ChatGPTProductPromptGenerator.Types.SEO_TITLE,
+        'seo_description': ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION,
+    }
 
     def get_data(self, request) -> dict:
         serializer = self.post_body_serializer(data=request.data)
@@ -177,21 +184,41 @@ class ProductUpdateAPI(APIView):
         return Response(response_data)
 
 
-class ProductListDescriptionsAPI(ListAPIView):
-    prompt_type = ChatGPTProductPromptGenerator.Types.DESCRIPTION
+class ProductListHistoryAPI(ListAPIView):
     serializer_class = serializers.UserPromptSerializer
+    post_body_serializer = serializers.ProductListHistoryPOSTBodySerializer
+
+    prompt_types = {
+        'title': ChatGPTProductPromptGenerator.Types.TITLE,
+        'description': ChatGPTProductPromptGenerator.Types.DESCRIPTION,
+        'seo_title': ChatGPTProductPromptGenerator.Types.SEO_TITLE,
+        'seo_description': ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION,
+    }
+
+    def get_data(self, request) -> dict:
+        serializer = self.post_body_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        return data
 
     def get_queryset(self):
-        product_id = self.kwargs['product_id']
-        return (
-            self.request.user
-                .prompts
-                .filter(
-                    meta__prompt_type=self.prompt_type,
-                    meta__product_id=product_id,
-                )
-                .order_by('-id')
+        data = self.get_data(self.request)
+        product_id = data['product_id']
+        prompt_type = self.prompt_types.get(data['prompt_type'])
+        assert prompt_type, 'Invalid prompt type'
+
+        qs = (
+            self.request.user.prompts
+                .filter(meta__prompt_type=prompt_type, meta__product_id=product_id)
         )
+        return qs.order_by('-id')
+
+    def get(self, request):
+        raise MethodNotAllowed('GET')
+
+    def post(self, request):
+        return self.list(request)
 
 
 class WebhookAPI(APIView):
