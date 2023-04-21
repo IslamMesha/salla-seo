@@ -119,7 +119,6 @@ class ProductsListAPI(ListAPIView):
 
 class ProductGetDescriptionAPI(APIView):
     post_body_serializer = serializers.ProductGetDescriptionPOSTBodySerializer
-    prompt_type = ChatGPTProductPromptGenerator.Types.DESCRIPTION
     prompt_types = {
         'title': ChatGPTProductPromptGenerator.Types.TITLE,
         'description': ChatGPTProductPromptGenerator.Types.DESCRIPTION,
@@ -132,31 +131,14 @@ class ProductGetDescriptionAPI(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
 
-        # it will be useful for differentiating between different prompts
-        data.update({'prompt_type': self.prompt_type})
         return data
 
     def ask_chat_gpt(self, data: dict) -> ChatGPTLog:
         prompt_generator = ChatGPTProductPromptGenerator(data)
-        description_prompt = prompt_generator.ask_for_description()
-
-        chat_gpt = ChatGPT().ask(description_prompt)
-        return chat_gpt
-
-    def check_in_database(self, user: SallaUser, data: dict) -> ChatGPTLog:
-        user_prompts_qs = user.prompts.filter(
-            meta__product_id=data['product_id'],
-            meta__prompt_type=data['prompt_type'],
-        )
-
-        chat_gpt = None
-        if user_prompts_qs.exists():
-            chat_gpt = user_prompts_qs.first().chat_gpt_log
-
+        chat_gpt = ChatGPT().ask(prompt_generator.get_prompt())
         return chat_gpt
 
     def post(self, request):
-        # check if user already asked for this product
         data = self.get_data(request)
         chat_gpt = self.ask_chat_gpt(data)
         UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
