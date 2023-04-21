@@ -164,9 +164,9 @@ class SubmitToSallaAPI(APIView):
         body = {salla_key_name: data['new_value']}
 
         writer = SallaWriter(account)
-        response_data = writer.product_update(data['product_id'], body)
+        writer.product_update(data['product_id'], body)
 
-        return Response(response_data)
+        return Response({'new_value': data['new_value']})
 
 
 class ProductListHistoryAPI(ListAPIView):
