@@ -7,6 +7,7 @@
     data-product="{{ product|to_json }}"
     data-history-url="{% url 'app:product_history' %}"
     data-edit-url="{% url 'app:ask_gpt' %}"
+    data-salla-submit-url="{% url 'app:salla_submit' %}"
     >
     <div
       id="product-{{ forloop.counter }}"
