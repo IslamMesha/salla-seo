@@ -91,7 +91,9 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     product_id = serializers.CharField(source='id', read_only=True)
     product_name = serializers.CharField(source='name', read_only=True)
     keywords = serializers.SerializerMethodField(read_only=True)
-    
+
+    prompt_type = serializers.ChoiceField(required=True, choices=['title', 'description','seo_title','seo_description'])
+
     def get_keywords(self, obj):
         return ', '.join(obj['keywords'])
 
