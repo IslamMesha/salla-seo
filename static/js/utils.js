@@ -22,3 +22,21 @@ function resetTextInputField(textInputField) {
   textInputField.value = "";
   textInputField.focus();
 }
+
+function postMethod(jsonBody){
+  return {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(jsonBody),
+  }
+}
+
+function getCardElement(currentElement) {
+  if (currentElement.dataset.hasOwnProperty('product'))
+    return currentElement;
+  else if (currentElement.parentElement === null)
+    return null;
+
+  return getCardElement(currentElement.parentElement);
+}
+
