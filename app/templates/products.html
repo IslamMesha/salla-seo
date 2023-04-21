@@ -7,7 +7,9 @@
   {% for product in products %}
   <div
     class="product overflow-hidden shadow-md bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
-  >
+    data-product="{{ product|to_json }}"
+    data-history-url="{% url 'app:product_history' %}"
+    >
     <div
       id="product-{{ forloop.counter }}"
       class="product-image image-container"
@@ -48,14 +50,14 @@
     <div class="product-info px-4 py-5">
       <h3 class="font-bold mb-2">معلومات المنتج</h3>
 
-      <div>
+      <div data-prompt-type="title">
         <label class="text-gray-400 font-bold mb-2 text-xs">اسم المنتج</label>
         <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
         <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
 
         <p class="product-seo-title break-all mb-3">{{ product.name }}</p>
       </div>
-      <div>
+      <div data-prompt-type="description">
         <label class="text-gray-400 font-bold mb-2 text-xs">وصف المنتج</label>
         <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
         <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
@@ -68,7 +70,7 @@
     <div class="product-seo-info px-4">
       <h3 class="font-bold mb-2">معلومات السيو</h3>
 
-      <div>
+      <div data-prompt-type="seo_title">
         <label class="text-gray-400 font-bold mb-2 text-xs">عنوان السيو (الخاص بمحرك البحث)</label>
         <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
         <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
@@ -77,7 +79,7 @@
           {% if product.metadata.title %} {{ product.metadata.title }} {% else %} غير معرف {% endif %}
         </p>
       </div>
-      <div>
+      <div data-prompt-type="seo_description">
         <label class="text-gray-400 font-bold mb-2 text-xs">وصف السيو (الخاص بمحرك البحث)</label>
         <i class="far fa-edit text-gray-400 text-sm cursor-pointer" aria-label="Generate with GPT" title="Generate with GPT"></i>
         <i class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1" aria-label="List history" title="List history"></i>
@@ -119,14 +121,6 @@
     </div>
 
     <div class="bottom-0 flex-grow flex flex-col-reverse">
-      <button
-        class="block bg-blue-500 hover:bg-blue-700 w-full font-bold text-white py-2 bottom-0"
-        data-product-id="{{ product.id }}"
-        data-url="{% url 'app:list_descriptions' product.id %}"
-      >
-        List Old Descriptions
-      </button>
-
       <button
         class="block bg-red-500 hover:bg-red-700 w-full font-bold text-white py-2 bottom-0"
         data-product="{{ product|to_json }}"
