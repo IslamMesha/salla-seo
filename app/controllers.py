@@ -9,11 +9,6 @@ from app.exceptions import SallaOauthFailedException, SallaEndpointFailureExcept
 from app.models import Account, ChatGPTLog, SallaUser
 from app import utils
 from app.enums import WebhookEvents
-from app.serializers import (
-    ProductEndpointParamsSerializer,
-    ChatGPTResponseSerializer,
-    SallaWebhookLogSerializer
-)
 
 
 class SallaOAuth:
@@ -136,6 +131,8 @@ class SallaMerchantReader(SallaBaseReader):
         return self.get(endpoint)
 
     def get_products(self, params: dict = None) -> dict:
+        from app.serializers import ProductEndpointParamsSerializer
+
         endpoint = '/products'
         params = self.get_params(ProductEndpointParamsSerializer, params)
 
@@ -195,6 +192,8 @@ class ChatGPT:
         self.openai = openai
 
     def __log_to_db(self, prompt: str, response: dict) -> ChatGPTLog:
+        from app.serializers import ChatGPTResponseSerializer
+
         response.update({'prompt': prompt})
 
         serializer = ChatGPTResponseSerializer(data=response)
@@ -248,6 +247,17 @@ class ChatGPTProductPromptGenerator:
         template = self.__get_template().format(**self.data)
         return template
 
+    @classmethod
+    def get_prompt_types(cls) -> list:
+        types = [
+            value
+            for key, value in
+            ChatGPTProductPromptGenerator.Types.__dict__.items()
+            if key.isupper()
+        ]
+
+        return types
+
     class Types:
         TITLE = 'title'
         DESCRIPTION = 'description'
@@ -292,6 +302,8 @@ class SallaWebhook:
         return {'status': 'success'}
 
     def __log_to_db(self, response: dict) -> None:
+        from app.serializers import SallaWebhookLogSerializer
+
         serializer = SallaWebhookLogSerializer(data={
             'event': self.event,
             'merchant_id': self.merchant_id,
