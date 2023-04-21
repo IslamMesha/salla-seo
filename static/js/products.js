@@ -1,68 +1,60 @@
-const getDescriptionButtons = document.querySelectorAll("button[data-product]");
-const deleteKeywordButtons = document.querySelectorAll(".delete-keyword");
-const addKeywordButtons = document.querySelectorAll(".add-keyword");
 const productIcons = document.querySelectorAll(".product i");
+const editInput = createElement(`
+  <div class="mt-2 mb-3">
+    <div class="flex rounded overflow-hidden space-x-2 space-x-reverse">
+      <input type="text" class="inline-block border-2 border-solid text-sm border-gray-300 w-full p-1 text-sm flex-grow outline-none rounded-lg overflow-hidden px-3" placeholder="أضف كلمات مفتاحية"/>
+      <button type="submit" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+      <button onclick="document.querySelector('#keyword-help-text').classList.toggle('hidden')" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none inline">
+        <i class="fas fa-question"></i>
+      </button>
+    </div>
 
+    <span id="keyword-help-text" class="block text-xs font-bold text-gray-400 hidden">لدقة افضل ضع كلمات مفتاحية تصف المنتج مثال : فستان, طويل, صيفي</span>
+  </div>
+`);
 
-function createDeleteKeywordButton() {
-  const deleteKeywordButton = document.createElement("span");
-  const classes = [
-    "delete-keyword",
-    "rounded",
-    "inline-block",
-    "text-white",
-    "font-bold",
-    "bg-red-500",
-    "hover:bg-red-700",
-    "cursor-pointer",
-    "w-4",
-    "text-center",
-    "ml-1",
-  ];
+function getTakeOrLeaveElement(textElement, oldText){
+  // NOTE textElement already has the new text
 
-  deleteKeywordButton.classList.add(...classes);
-  deleteKeywordButton.innerHTML = "&times;";
+  const elm = createElement(`
+    <div class="flex justify-center space-x-2 space-x-reverse mb-4">
+      <button type="button" class="accept w-6 h-6 text-xs text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none">
+        <i class="fas fa-check"></i>
+      </button>
+      <button type="button" class="cancelled w-6 h-6 text-xs text-white bg-red-500 rounded hover:bg-red-600 focus:outline-none">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `);
+  elm.querySelector('.accept').addEventListener('click', () => {
+    const cardElement = getCardElement(textElement);
+    let { product, sallaSubmitUrl } = cardElement.dataset;
+    product = JSON.parse(product);
+    const request = postMethod({
+      product_id: product.id,
+      prompt_type: textElement.dataset.promptType,
+      new_value: textElement.innerText,
+    });
 
-  return deleteKeywordButton;
-}
+    fetch(sallaSubmitUrl, request)
+      .then((response) => response.json())
+      .then((data) => {})
+      .catch((error) => console.error(error))
+      .finally(() => elm.remove());
+  });
 
-function createKeywordElement(keyword) {
-  const keywordElement = document.createElement("span");
-  const classes = [
-    "keyword",
-    "text-sm",
-    "text-center",
-    "px-1",
-    "py-1",
-    "bg-yellow-300",
-    "rounded",
-    "font-bold",
-    "mr-1",
-    "mb-1",
-    "inline-block",
-  ];
+  if(oldText){
+    elm.querySelector('.cancelled').addEventListener('click', () => {
+      textElement.innerText = oldText;
+      elm.remove();
+    });
+  } else {
+    elm.querySelector('.cancelled').classList.add('hidden')
+  }
 
-  keywordElement.classList.add(...classes);
-  keywordElement.innerText = keyword;
-
-  return keywordElement;
-}
-
-function getKeywords(keywordsElement) {
-  return Array.from(keywordsElement.querySelectorAll(".keyword")).map(
-    (keyword) => keyword.firstChild.textContent.trim()
-  );
-}
-
-function addKeyword(keyword, keywordsElement) {
-  const keywordElement = createKeywordElement(keyword);
-  const deleteKeywordButton = createDeleteKeywordButton();
-  keywordElement.appendChild(deleteKeywordButton);
-  keywordsElement.appendChild(keywordElement);
-
-  deleteKeywordButton.addEventListener("click", () =>
-    deleteKeywordButton.parentElement.remove()
-  );
+  return elm;
 }
 
 function createDescriptionPopupListItem(description) {
@@ -74,163 +66,123 @@ function createDescriptionPopupListItem(description) {
     `);
 
   if (description.meta.keywords_str) {
-    const keywordsElement = document.createElement("span");
-
-    keywordsElement.innerText = description.meta.keywords_str;
-    keywordsElement.classList.add(
-      "text-gray-500",
-      "text-sm",
-      "block",
-      "font-bold",
-      "flex",
-      "flex-row-reverse",
-      "mt-3"
+    descriptionElement.appendChild(
+      createElement(`
+        <span class="text-gray-500 text-sm block font-bold flex flex-row-reverse mt-3">
+          ${description.meta.keywords_str}
+        </span>
+      `)
     );
-    descriptionElement.appendChild(keywordsElement);
   }
 
   return descriptionElement;
 }
 
-function addEventToSetDescriptionButton(
-  setDescriptionButton,
-  textElement,
-  productId,
-  description
-) {
-  setDescriptionButton.addEventListener("click", () => {
+function addEventToSetDescriptionButton(button, textElement) {
+  button.addEventListener("click", () => {
     const undo = buttonToLoading(setDescriptionButton);
-    const setDescriptionUrl = `/salla/write-description/${productId}/`;
+    const cardElement = getCardElement(textElement);
+    let { product, sallaSubmitUrl } = cardElement.dataset;
 
-    fetch(setDescriptionUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description }),
-    })
+    product = JSON.parse(product);
+    const request = postMethod({
+      product_id: product.id,
+      prompt_type: textElement.dataset.promptType,
+      new_value: button.parentElement.querySelector('span').innerText.trim(),
+    });
+
+    fetch(sallaSubmitUrl, request)
       .then((response) => response.json())
-      .then((data) => {
-        textElement.innerText = description;
+      .then(({ new_value }) => {
+        textElement.innerText = new_value;
         closePopup(listDescriptionLogPopup);
-        setDescriptionButton.remove();
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.error(error))
       .finally(() => undo());
   });
 }
-
-getDescriptionButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const undo = buttonToLoading(button);
-    const cardElement = button.parentElement.parentElement;
-    const url = "{% url 'app:ask_for_description' %}";
-    const keywordsElement = cardElement.querySelector(
-      ".keywords div:first-child"
-    );
-    const product = JSON.parse(button.getAttribute("data-product"));
-    const request = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...product,
-        keywords_list: getKeywords(keywordsElement),
-      }),
-    };
-
-    fetch(url, request)
-      .then((response) => response.json())
-      .then((data) => {
-        const descriptionElement = cardElement.querySelector(
-          ".product-description"
-        );
-        const setDescriptionButton = createElement(`
-                    <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
-                `);
-        const description = data.description;
-
-        descriptionElement.innerText = data.description;
-        descriptionElement.parentElement.appendChild(setDescriptionButton);
-
-        addEventToSetDescriptionButton(
-          setDescriptionButton,
-          description,
-          product.id,
-          cardElement
-        );
-      })
-      .catch((error) => console.log(error))
-      .finally(() => undo());
-  });
-});
-
-deleteKeywordButtons.forEach((button) =>
-  button.addEventListener("click", () => button.parentElement.remove())
-);
-
-addKeywordButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const inputField = button.previousElementSibling;
-    const keyword = inputField.value;
-    const keywordsElement =
-      button.parentElement.parentElement.parentElement.querySelector(
-        ".keywords div:first-child"
-      );
-    const keywordsArray = getKeywords(keywordsElement);
-
-    if (keywordsArray.includes(keyword)) {
-      resetTextInputField(inputField);
-      return;
-    }
-
-    addKeyword(keyword, keywordsElement);
-    resetTextInputField(inputField);
-  });
-});
 
 productIcons.forEach((icon) => {
   icon.addEventListener("click", () => {
     const isAlreadyClicked = icon.classList.contains("opacity-50");
     const isListHistory = icon.classList.contains("fa-history");
-    if (isAlreadyClicked || !isListHistory)
+    const isEditAction = icon.classList.contains("fa-edit");
+    if (isAlreadyClicked)
       return;
 
-    const { promptType } = icon.parentElement.dataset;
-    let { product, historyUrl } = getCardElement(icon).dataset
-    product = JSON.parse(product);
+    icon.classList.add("opacity-50");
 
-    openPopup(listDescriptionLogPopup);
+    if (isListHistory){
+      const { promptType } = icon.parentElement.dataset;
+      let { product, historyUrl } = getCardElement(icon).dataset
+      product = JSON.parse(product);
+  
+      openPopup(listDescriptionLogPopup);
+  
+      fetch(historyUrl, postMethod({prompt_type: promptType, product_id: product.id }))
+        .then((response) => response.json())
+        .then((data) => {
+          const popup = document
+            .getElementById(listDescriptionLogPopup)
+            .querySelector(".bg-white");
+  
+          popup.querySelector("h2").innerText = product.name;
+          data.forEach((description) => {
+            const descriptionElement = createDescriptionPopupListItem(description);
+            const setDescriptionButton = descriptionElement.querySelector(".set-description");
+            const textElement = icon.parentElement.querySelector('p');
+  
+            popup.appendChild(descriptionElement);
+            addEventToSetDescriptionButton(setDescriptionButton, textElement);
+          });
+          if (data.length === 0) {
+            const noDescriptionElement = createElement(`
+                      <div class="description-item text-center text-capitalize text-3xl text-gray-400 font-bold">
+                          <span>No history found</span>
+                      </div>
+                  `);
+            popup.appendChild(noDescriptionElement);
+          }
+        })
+        .catch((error) => console.log(error))
+        .finally(() => icon.classList.remove('opacity-50'));
+    } else if (isEditAction) {
+      const EditingParentElement = icon.parentElement;
 
-    fetch(historyUrl, postMethod({prompt_type: promptType, product_id: product.id }))
-      .then((response) => response.json())
-      .then((data) => {
-        const popup = document
-          .getElementById(listDescriptionLogPopup)
-          .querySelector(".bg-white");
+      EditingParentElement.appendChild(editInput)
+      resetTextInputField(editInput.querySelector('input'))
 
-        popup.querySelector("h2").innerText = product.name;
-        data.forEach((description) => {
-          const descriptionElement = createDescriptionPopupListItem(description);
-          const setDescriptionButton = descriptionElement.querySelector(".set-description");
-          const descriptionText = setDescriptionButton.parentElement.firstElementChild.innerText;
-          const textElement = icon.parentElement.querySelector('p');
+      icon.classList.remove("opacity-50");
+    }
 
-          popup.appendChild(descriptionElement);
-          addEventToSetDescriptionButton(
-            setDescriptionButton,
-            textElement,
-            product.id,
-            descriptionText,
-          );
-        });
-        if (data.length === 0) {
-          const noDescriptionElement = createElement(`
-                    <div class="description-item text-center text-capitalize text-3xl text-gray-400 font-bold">
-                        <span>No history found</span>
-                    </div>
-                `);
-          popup.appendChild(noDescriptionElement);
-        }
-      })
-      .catch((error) => console.log(error))
-      .finally(() => icon.classList.remove('opacity-50'));
   });
 });
+
+editInput.querySelector('button').addEventListener('click', () => {
+  const cardElement = getCardElement(editInput);
+  const textElement = editInput.parentElement.querySelector('p');
+
+  let { product, editUrl } = cardElement.dataset
+  product = JSON.parse(product);
+
+  const request = postMethod({
+    product_id: product.id,
+    product_name: product.name,
+    keywords: editInput.querySelector('input').value,
+    prompt_type: editInput.parentElement.dataset.promptType,
+  })
+
+  fetch(editUrl, request)
+    .then((response) => response.json())
+    .then((data) => {
+      const oldText = textElement.innerText;
+
+      textElement.innerText = data.description;
+      editInput.parentElement.appendChild(
+        getTakeOrLeaveElement(textElement, oldText)
+      );
+    })
+    .catch((error) => console.error(error))
+    .finally(() => editInput.classList.add('hidden'));
+});
+
