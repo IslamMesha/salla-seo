@@ -134,7 +134,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': 'logs/info.log',
+            'filename': '/home/django/logs/info.log',
             'formatter': 'main_formatter',
         }
     },
