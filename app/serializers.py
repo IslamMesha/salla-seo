@@ -1,8 +1,10 @@
 from rest_framework import serializers
 
 from app import models
-from SiteServe.models import CHATGPT_PROMPT_TYPES
 
+def PROMPT_TYPES():
+    from app import controllers
+    return controllers.ChatGPTProductPromptGenerator.get_prompt_types()
 
 class SallaUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -92,16 +94,18 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     product_name = serializers.CharField(source='name', read_only=True)
     keywords = serializers.CharField(required=False)
 
-    prompt_type = serializers.ChoiceField(required=True, choices=CHATGPT_PROMPT_TYPES(is_2d=False))
+    prompt_type = serializers.ChoiceField(required=True, choices=PROMPT_TYPES())
 
 
 class ProductListHistoryPOSTBodySerializer(serializers.Serializer):
     product_id = serializers.CharField(required=True)
-    prompt_type = serializers.ChoiceField(required=True, choices=CHATGPT_PROMPT_TYPES(is_2d=False))
+    prompt_type = serializers.ChoiceField(required=True, choices=PROMPT_TYPES())
 
 
 class ProductUpdatePOSTBodySerializer(serializers.Serializer):
-    description = serializers.CharField(required=True)
+    product_id = serializers.CharField(required=True)
+    prompt_type = serializers.ChoiceField(required=True, choices=PROMPT_TYPES())
+    new_value = serializers.CharField(required=True)
 
 
 class LoginPOSTBodySerializer(serializers.Serializer):
