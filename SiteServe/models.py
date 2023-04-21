@@ -10,17 +10,12 @@ from django.shortcuts import reverse
 def NAV_ORDERING_CALCULATOR():
     return (StaticPage.objects.filter(is_nav=True).count() + 1) * 10
 
-def CHATGPT_PROMPT_TYPES(is_2d=True):
+def CHATGPT_PROMPT_TYPES():
     from app.controllers import ChatGPTProductPromptGenerator
     from app.utils import list_to_choices
-    types = [
-        value
-        for key, value in
-        ChatGPTProductPromptGenerator.Types.__dict__.items()
-        if key.isupper()
-    ]
 
-    return list_to_choices(types) if is_2d else types
+    types = ChatGPTProductPromptGenerator.get_prompt_types()
+    return list_to_choices(types)
 
 def CHATGPT_PROMPT_LANGUAGES():
     from app.utils import list_to_choices
