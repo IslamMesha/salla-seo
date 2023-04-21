@@ -34,7 +34,7 @@ function getTakeOrLeaveElement(textElement, oldText){
     product = JSON.parse(product);
     const request = postMethod({
       product_id: product.id,
-      prompt_type: textElement.dataset.promptType,
+      prompt_type: textElement.parentElement.dataset.promptType,
       new_value: textElement.innerText,
     });
 
@@ -80,14 +80,14 @@ function createDescriptionPopupListItem(description) {
 
 function addEventToSetDescriptionButton(button, textElement) {
   button.addEventListener("click", () => {
-    const undo = buttonToLoading(setDescriptionButton);
+    const undo = buttonToLoading(button);
     const cardElement = getCardElement(textElement);
     let { product, sallaSubmitUrl } = cardElement.dataset;
 
     product = JSON.parse(product);
     const request = postMethod({
       product_id: product.id,
-      prompt_type: textElement.dataset.promptType,
+      prompt_type: textElement.parentElement.dataset.promptType,
       new_value: button.parentElement.querySelector('span').innerText.trim(),
     });
 
@@ -183,6 +183,6 @@ editInput.querySelector('button').addEventListener('click', () => {
       );
     })
     .catch((error) => console.error(error))
-    .finally(() => editInput.classList.add('hidden'));
+    .finally(() => editInput.remove());
 });
 
