@@ -11,7 +11,7 @@ urlpatterns = [
 
     path('products/', views.ProductsListAPI.as_view(), name='list_products'),
 
-    path('ask-gpt/description/', views.ProductGetDescriptionAPI.as_view(), name='ask_for_description'),
+    path('ask-gpt/description/', views.ProductGetDescriptionAPI.as_view(), name='ask_gpt'),
     path('salla/write-description/<str:product_id>/', views.ProductUpdateAPI.as_view(), name='update_descriptions'),
     path('product/history/', views.ProductListHistoryAPI.as_view(), name='product_history'),
 
