@@ -19,7 +19,7 @@ from app.utils import set_cookie, validate_email_and_password
 from app.enums import CookieKeys
 from app import serializers
 
-logger = logging.getLogger('main')
+# logger = logging.getLogger('main')
 
 
 class Index(APIView):
@@ -223,7 +223,7 @@ class SettingsValidationAPI(APIView):
         email, password = self.extract_data(request.data)
 
         if email is None or password is None:
-            logger.error(f'[SETTINGS_VALIDATION]: {request.data}')
+            # logger.error(f'[SETTINGS_VALIDATION]: {request.data}')
             raise ValidationError({'error': 'Email and password are required.'})
 
         is_valid = validate_email_and_password(email, password)
