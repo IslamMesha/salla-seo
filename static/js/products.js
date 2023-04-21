@@ -1,9 +1,8 @@
 const getDescriptionButtons = document.querySelectorAll("button[data-product]");
-const listOldDescriptionsButtons = document.querySelectorAll(
-  "button[data-product-id]"
-);
 const deleteKeywordButtons = document.querySelectorAll(".delete-keyword");
 const addKeywordButtons = document.querySelectorAll(".add-keyword");
+const productIcons = document.querySelectorAll(".product i");
+
 
 function createDeleteKeywordButton() {
   const deleteKeywordButton = document.createElement("span");
@@ -95,9 +94,9 @@ function createDescriptionPopupListItem(description) {
 
 function addEventToSetDescriptionButton(
   setDescriptionButton,
-  description,
+  textElement,
   productId,
-  cardElement
+  description
 ) {
   setDescriptionButton.addEventListener("click", () => {
     const undo = buttonToLoading(setDescriptionButton);
@@ -110,8 +109,7 @@ function addEventToSetDescriptionButton(
     })
       .then((response) => response.json())
       .then((data) => {
-        cardElement.querySelector(".product-description").innerText =
-          description;
+        textElement.innerText = description;
         closePopup(listDescriptionLogPopup);
         setDescriptionButton.remove();
       })
@@ -164,47 +162,6 @@ getDescriptionButtons.forEach((button) => {
   });
 });
 
-listOldDescriptionsButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const undo = buttonToLoading(button);
-    const url = button.dataset.url;
-    const cardElement = button.parentElement.parentElement;
-    const product = JSON.parse(
-      cardElement.querySelector("[data-product]").dataset.product
-    );
-
-    openPopup(listDescriptionLogPopup);
-
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        const popup = document
-          .getElementById("popup")
-          .querySelector(".bg-white");
-
-        popup.querySelector("h2").innerText = product.name;
-        data.forEach((description) => {
-          const descriptionElement =
-            createDescriptionPopupListItem(description);
-          const setDescriptionButton =
-            descriptionElement.querySelector(".set-description");
-          const descriptionText =
-            setDescriptionButton.parentElement.firstElementChild.innerText;
-
-          popup.appendChild(descriptionElement);
-          addEventToSetDescriptionButton(
-            setDescriptionButton,
-            descriptionText,
-            product.id,
-            cardElement
-          );
-        });
-      })
-      .catch((error) => console.log(error))
-      .finally(() => undo());
-  });
-});
-
 deleteKeywordButtons.forEach((button) =>
   button.addEventListener("click", () => button.parentElement.remove())
 );
@@ -226,5 +183,46 @@ addKeywordButtons.forEach((button) => {
 
     addKeyword(keyword, keywordsElement);
     resetTextInputField(inputField);
+  });
+});
+
+productIcons.forEach((icon) => {
+  icon.addEventListener("click", () => {
+    const isAlreadyClicked = icon.classList.contains("opacity-50");
+    const isListHistory = icon.classList.contains("fa-history");
+    if (isAlreadyClicked || !isListHistory)
+      return;
+
+    const { promptType } = icon.parentElement.dataset;
+    let { product, historyUrl } = getCardElement(icon).dataset
+    product = JSON.parse(product);
+
+    openPopup(listDescriptionLogPopup);
+
+    fetch(historyUrl, postMethod({prompt_type: promptType, product_id: product.id }))
+      .then((response) => response.json())
+      .then((data) => {
+        const popup = document
+          .getElementById(listDescriptionLogPopup)
+          .querySelector(".bg-white");
+
+        popup.querySelector("h2").innerText = product.name;
+        data.forEach((description) => {
+          const descriptionElement = createDescriptionPopupListItem(description);
+          const setDescriptionButton = descriptionElement.querySelector(".set-description");
+          const descriptionText = setDescriptionButton.parentElement.firstElementChild.innerText;
+          const textElement = icon.parentElement.querySelector('p');
+
+          popup.appendChild(descriptionElement);
+          addEventToSetDescriptionButton(
+            setDescriptionButton,
+            textElement,
+            product.id,
+            descriptionText,
+          );
+        });
+      })
+      .catch((error) => console.log(error))
+      .finally(() => icon.classList.remove('opacity-50'));
   });
 });
