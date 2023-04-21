@@ -140,7 +140,7 @@ class AskGPTAboutProductAPI(APIView):
         return Response({'description': chat_gpt.answer})
 
 
-class ProductUpdateAPI(APIView):
+class SubmitToSallaAPI(APIView):
     post_body_serializer = serializers.ProductUpdatePOSTBodySerializer
 
     def get_data(self, request) -> dict:
@@ -150,12 +150,21 @@ class ProductUpdateAPI(APIView):
 
         return data
 
-    def post(self, request, product_id):
+    def post(self, request):
         account = request.user.account
-        body = self.get_data(request)
+        data = self.get_data(request)
+
+        salla_key_name = {
+            ChatGPTProductPromptGenerator.Types.TITLE: 'name',
+            ChatGPTProductPromptGenerator.Types.DESCRIPTION: 'description',
+            ChatGPTProductPromptGenerator.Types.SEO_TITLE: 'metadata_title',
+            ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION: 'metadata_description',
+        }.get(data['prompt_type'])
+
+        body = {salla_key_name: data['new_value']}
 
         writer = SallaWriter(account)
-        response_data = writer.product_update(product_id, body)
+        response_data = writer.product_update(data['product_id'], body)
 
         return Response(response_data)
 
