@@ -96,6 +96,11 @@ class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
         return ', '.join(obj['keywords'])
 
 
+class ProductListHistoryPOSTBodySerializer(serializers.Serializer):
+    product_id = serializers.CharField(required=True)
+    prompt_type = serializers.ChoiceField(required=True, choices=['title', 'description','seo_title','seo_description'])
+
+
 class ProductUpdatePOSTBodySerializer(serializers.Serializer):
     description = serializers.CharField(required=True)
 
