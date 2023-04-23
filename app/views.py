@@ -87,8 +87,6 @@ class Logout(APIView):
 def oauth_callback(request):
     code = request.GET.get('code')
     if code:
-        messages.success(request, 'Login Success.')
-
         base_url = request.build_absolute_uri('/')
         data = SallaOAuth(base_url).get_access_token(code)
         account = Account.store(data)
@@ -97,14 +95,10 @@ def oauth_callback(request):
         month = 60 * 60 * 24 * 30
         set_cookie(response, CookieKeys.AUTH_TOKEN.value, account.public_token, max_age=month)
     else:
-        raise SallaOauthFailedException()
+        response = redirect('app:index')
+        # raise SallaOauthFailedException()
 
     return response
-
-
-class Test(APIView):
-    def get(self, request):
-        return Response({'message': 'Hello World!'})
 
 
 class ProductsListAPI(ListAPIView):

@@ -15,7 +15,6 @@ urlpatterns = [
     path('salla/submit/', views.SubmitToSallaAPI.as_view(), name='salla_submit'),
     path('product/history/', views.ProductListHistoryAPI.as_view(), name='product_history'),
 
-    path('test/', views.Test.as_view(), name='test'),
     path('oauth/callback/', views.oauth_callback, name='oauth_callback'),
     path('webhook/', views.WebhookAPI.as_view(), name='webhook'),
     path('settings/validation/', views.SettingsValidationAPI.as_view(), name='settings_validation'),
