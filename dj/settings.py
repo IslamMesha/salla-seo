@@ -91,7 +91,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-if DEBUG:
+if IS_LOCAL:= os.getenv('IS_LOCAL', False) == 'True':
     STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")] #in settings.py
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, "static/")
