@@ -1,0 +1,10 @@
+{% load custom_filters %}{% load static %}
+
+<div class="products pt-12 flex flex-wrap">
+  {% for product in products %}
+  {% include 'components/product.html' %}
+  {% endfor %}
+</div>
+
+{% include 'components/pagination.html' %}
+<script src="{% static 'js/products.js' %}" defer></script>

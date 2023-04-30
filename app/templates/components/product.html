@@ -1,0 +1,99 @@
+{% load custom_filters %}
+
+<div
+  class="product overflow-hidden shadow-md bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
+  data-product="{{ product|to_json }}"
+  data-history-url="{% url 'app:product_history' %}"
+  data-edit-url="{% url 'app:ask_gpt' %}"
+  data-salla-submit-url="{% url 'app:salla_submit' %}"
+>
+  <div id="product-{{ forloop.counter }}" class="product-image image-container">
+    <img
+      class="block m-auto h-80 object-cover relative"
+      src="{{ product.main_image }}"
+      alt="Product Image"
+    />
+
+    {% include 'components/product_custom_style.html' %}
+  </div>
+  <div class="product-info px-4 py-5">
+    <h3 class="font-bold mb-2">معلومات المنتج</h3>
+
+    <div data-prompt-type="title">
+      <label class="text-gray-400 font-bold mb-2 text-xs">اسم المنتج</label>
+      <i
+        class="far fa-edit text-gray-400 text-sm cursor-pointer"
+        aria-label="Generate with GPT"
+        title="Generate with GPT"
+      ></i>
+      <i
+        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
+        aria-label="List history"
+        title="List history"
+      ></i>
+
+      <p class="product-seo-title break-all mb-3">{{ product.name }}</p>
+    </div>
+    <div data-prompt-type="description">
+      <label class="text-gray-400 font-bold mb-2 text-xs">وصف المنتج</label>
+      <i
+        class="far fa-edit text-gray-400 text-sm cursor-pointer"
+        aria-label="Generate with GPT"
+        title="Generate with GPT"
+      ></i>
+      <i
+        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
+        aria-label="List history"
+        title="List history"
+      ></i>
+
+      <p class="product-description text-sm break-all">
+        {{ product.description }}
+      </p>
+    </div>
+  </div>
+  <div class="product-seo-info px-4 pb-5">
+    <h3 class="font-bold mb-2">معلومات السيو</h3>
+
+    <div data-prompt-type="seo_title">
+      <label class="text-gray-400 font-bold mb-2 text-xs"
+        >عنوان السيو (الخاص بمحرك البحث)</label
+      >
+      <i
+        class="far fa-edit text-gray-400 text-sm cursor-pointer"
+        aria-label="Generate with GPT"
+        title="Generate with GPT"
+      ></i>
+      <i
+        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
+        aria-label="List history"
+        title="List history"
+      ></i>
+
+      <p class="product-seo-title break-all mb-3">
+        {% if product.metadata.title %} {{ product.metadata.title }} {% else %}
+        غير معرف {% endif %}
+      </p>
+    </div>
+    <div data-prompt-type="seo_description">
+      <label class="text-gray-400 font-bold mb-2 text-xs"
+        >وصف السيو (الخاص بمحرك البحث)</label
+      >
+      <i
+        class="far fa-edit text-gray-400 text-sm cursor-pointer"
+        aria-label="Generate with GPT"
+        title="Generate with GPT"
+      ></i>
+      <i
+        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
+        aria-label="List history"
+        title="List history"
+      ></i>
+
+      <p class="product-seo-description break-all">
+        {% if product.metadata.description %} {{ product.metadata.description}}
+        {% else %} غير معرف {% endif %}
+      </p>
+    </div>
+  </div>
+</div>
