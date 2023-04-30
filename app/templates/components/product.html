@@ -1,20 +1,25 @@
 {% load custom_filters %}
 
 <div
+  id="product-{{ forloop.counter }}"
   class="product overflow-hidden shadow-md bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
   data-product="{{ product|to_json }}"
   data-history-url="{% url 'app:product_history' %}"
   data-edit-url="{% url 'app:ask_gpt' %}"
   data-salla-submit-url="{% url 'app:salla_submit' %}"
 >
-  <div id="product-{{ forloop.counter }}" class="product-image image-container">
+  <div class="product-image image-container">
     <img
       class="block m-auto h-80 object-cover relative"
       src="{{ product.main_image }}"
       alt="Product Image"
     />
 
-    {% include 'components/product_custom_style.html' %}
+    <style>
+      #product-{{ forloop.counter }} .product-image:before {
+        background-image: url({{ product.main_image }});
+      }
+    </style>
   </div>
   <div class="product-info px-4 py-5">
     <h3 class="font-bold mb-2">معلومات المنتج</h3>
@@ -77,8 +82,7 @@
     </div>
     <div data-prompt-type="seo_description">
       <label class="text-gray-400 font-bold mb-2 text-xs"
-        >وصف السيو (الخاص بمحرك البحث)</label
-      >
+        >وصف السيو (الخاص بمحرك البحث)</label>
       <i
         class="far fa-edit text-gray-400 text-sm cursor-pointer"
         aria-label="Generate with GPT"
