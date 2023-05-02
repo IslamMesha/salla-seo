@@ -164,6 +164,10 @@ editInput.querySelector('button').addEventListener('click', () => {
   const textElement = editInput.parentElement.querySelector('p');
   const icon = editInput.querySelector('i');
 
+  const isAlreadyClicked = icon.classList.contains("fa-spinner");
+  if (isAlreadyClicked)
+    return;
+
   const iconUnloading = iconToLoading(icon);
 
   let { product, editUrl } = cardElement.dataset
