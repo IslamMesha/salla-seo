@@ -40,3 +40,22 @@ function getCardElement(currentElement) {
   return getCardElement(currentElement.parentElement);
 }
 
+function iconToLoading(icon) {
+  const oldClasses = [];
+  const loadingClasses = ['fas', 'fa-spinner', 'fa-pulse'];
+  icon.classList.forEach((className) => {
+    if(className.startsWith("fa")){
+      oldClasses.push(className);
+      icon.classList.remove(className);
+    }
+  });
+
+  icon.classList.add(...loadingClasses);
+
+  // undo function
+  return () => {
+    icon.classList.remove(...loadingClasses);
+    icon.classList.add(...oldClasses);
+  }
+}
+

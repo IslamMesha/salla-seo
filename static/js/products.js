@@ -104,13 +104,14 @@ function addEventToSetDescriptionButton(button, textElement) {
 
 productIcons.forEach((icon) => {
   icon.addEventListener("click", () => {
-    const isAlreadyClicked = icon.classList.contains("opacity-50");
+    const isAlreadyClicked = icon.classList.contains("fa-spinner");
     const isListHistory = icon.classList.contains("fa-history");
     const isEditAction = icon.classList.contains("fa-edit");
+
     if (isAlreadyClicked)
       return;
 
-    icon.classList.add("opacity-50");
+    const iconUnloading = iconToLoading(icon)
 
     if (isListHistory){
       const { promptType } = icon.parentElement.dataset;
@@ -145,14 +146,14 @@ productIcons.forEach((icon) => {
           }
         })
         .catch((error) => console.log(error))
-        .finally(() => icon.classList.remove('opacity-50'));
+        .finally(() => iconUnloading());
     } else if (isEditAction) {
       const EditingParentElement = icon.parentElement;
 
       EditingParentElement.appendChild(editInput)
       resetTextInputField(editInput.querySelector('input'))
 
-      icon.classList.remove("opacity-50");
+      iconUnloading();
     }
 
   });
@@ -161,6 +162,9 @@ productIcons.forEach((icon) => {
 editInput.querySelector('button').addEventListener('click', () => {
   const cardElement = getCardElement(editInput);
   const textElement = editInput.parentElement.querySelector('p');
+  const icon = editInput.querySelector('i');
+
+  const iconUnloading = iconToLoading(icon);
 
   let { product, editUrl } = cardElement.dataset
   product = JSON.parse(product);
@@ -183,6 +187,9 @@ editInput.querySelector('button').addEventListener('click', () => {
       );
     })
     .catch((error) => console.error(error))
-    .finally(() => editInput.remove());
+    .finally(() => {
+      editInput.remove();
+      iconUnloading();
+    });
 });
 
