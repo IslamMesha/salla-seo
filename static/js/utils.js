@@ -54,8 +54,9 @@ function iconToLoading(icon) {
 
   // undo function
   return () => {
-    icon.classList.remove(...loadingClasses);
+    icon.classList.remove('fa-spinner', 'fa-pulse');
     icon.classList.add(...oldClasses);
   }
+  
 }
 
