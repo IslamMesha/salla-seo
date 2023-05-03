@@ -3,6 +3,7 @@
 <div
   id="product-{{ forloop.counter }}"
   class="product overflow-hidden shadow-md bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
+  style="min-width: calc(100% / 3 - 16px);"
   data-product="{{ product|to_json }}"
   data-history-url="{% url 'app:product_history' %}"
   data-edit-url="{% url 'app:ask_gpt' %}"
@@ -21,37 +22,32 @@
       }
     </style>
   </div>
+
+  <div class="keywords-input px-4 pt-5">
+    <div class="flex rounded overflow-hidden space-x-2 space-x-reverse">
+      <input 
+        type="text"
+        class="inline-block border-2 border-solid text-sm border-gray-300 w-full p-1 text-sm flex-grow outline-none rounded-lg overflow-hidden px-3"
+        placeholder="فستان, طويل, صيفي"
+      />
+      <button type="submit" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+    <p id="error-msg" class="hidden mt-2 text-red-500 text-sm">يرجي ادخال كلمات مفتاحية للمنتج</p>
+  </div>
+
   <div class="product-info px-4 py-5">
     <h3 class="font-bold mb-2">معلومات المنتج</h3>
 
     <div data-prompt-type="title">
       <label class="text-gray-400 font-bold mb-2 text-xs">اسم المنتج</label>
-      <i
-        class="far fa-edit text-gray-400 text-sm cursor-pointer"
-        aria-label="Generate with GPT"
-        title="Generate with GPT"
-      ></i>
-      <i
-        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
-        aria-label="List history"
-        title="List history"
-      ></i>
-
+      {% include 'components/product_card_icons.html' %}
       <p class="product-seo-title break-all mb-3">{{ product.name }}</p>
     </div>
     <div data-prompt-type="description">
       <label class="text-gray-400 font-bold mb-2 text-xs">وصف المنتج</label>
-      <i
-        class="far fa-edit text-gray-400 text-sm cursor-pointer"
-        aria-label="Generate with GPT"
-        title="Generate with GPT"
-      ></i>
-      <i
-        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
-        aria-label="List history"
-        title="List history"
-      ></i>
-
+      {% include 'components/product_card_icons.html' %}
       <p class="product-description text-sm break-all">
         {{ product.description }}
       </p>
@@ -64,17 +60,7 @@
       <label class="text-gray-400 font-bold mb-2 text-xs"
         >عنوان السيو (الخاص بمحرك البحث)</label
       >
-      <i
-        class="far fa-edit text-gray-400 text-sm cursor-pointer"
-        aria-label="Generate with GPT"
-        title="Generate with GPT"
-      ></i>
-      <i
-        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
-        aria-label="List history"
-        title="List history"
-      ></i>
-
+      {% include 'components/product_card_icons.html' %}
       <p class="product-seo-title break-all mb-3">
         {% if product.metadata.title %} {{ product.metadata.title }} {% else %}
         غير معرف {% endif %}
@@ -83,17 +69,7 @@
     <div data-prompt-type="seo_description">
       <label class="text-gray-400 font-bold mb-2 text-xs"
         >وصف السيو (الخاص بمحرك البحث)</label>
-      <i
-        class="far fa-edit text-gray-400 text-sm cursor-pointer"
-        aria-label="Generate with GPT"
-        title="Generate with GPT"
-      ></i>
-      <i
-        class="fas fa-history text-gray-400 text-sm cursor-pointer mx-1"
-        aria-label="List history"
-        title="List history"
-      ></i>
-
+      {% include 'components/product_card_icons.html' %}
       <p class="product-seo-description break-all">
         {% if product.metadata.description %} {{ product.metadata.description}}
         {% else %} غير معرف {% endif %}
