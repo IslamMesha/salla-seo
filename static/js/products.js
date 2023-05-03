@@ -1,19 +1,5 @@
 const productIcons = document.querySelectorAll(".product i");
-const editInput = createElement(`
-  <div class="mt-2 mb-3">
-    <div class="flex rounded overflow-hidden space-x-2 space-x-reverse">
-      <input type="text" class="inline-block border-2 border-solid text-sm border-gray-300 w-full p-1 text-sm flex-grow outline-none rounded-lg overflow-hidden px-3" placeholder="أضف كلمات مفتاحية"/>
-      <button type="submit" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none">
-        <i class="fas fa-paper-plane"></i>
-      </button>
-      <button onclick="document.querySelector('#keyword-help-text').classList.toggle('hidden')" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none inline">
-        <i class="fas fa-question"></i>
-      </button>
-    </div>
-
-    <span id="keyword-help-text" class="block text-xs font-bold text-gray-400 hidden">لدقة افضل ضع كلمات مفتاحية تصف المنتج مثال : فستان, طويل, صيفي</span>
-  </div>
-`);
+const productKeywordInputs = document.querySelectorAll(".product .keywords-input");
 
 function getTakeOrLeaveElement(textElement, oldText){
   // NOTE textElement already has the new text
@@ -106,7 +92,8 @@ productIcons.forEach((icon) => {
   icon.addEventListener("click", () => {
     const isAlreadyClicked = icon.classList.contains("fa-spinner");
     const isListHistory = icon.classList.contains("fa-history");
-    const isEditAction = icon.classList.contains("fa-edit");
+    const isEditAction = icon.classList.contains("fa-magic");
+    const isEditAllAction = icon.classList.contains("fa-paper-plane");
 
     if (isAlreadyClicked)
       return;
@@ -148,52 +135,57 @@ productIcons.forEach((icon) => {
         .catch((error) => console.log(error))
         .finally(() => iconUnloading());
     } else if (isEditAction) {
-      const EditingParentElement = icon.parentElement;
+      /*
+      4- show the new text in the text element and ask for confirmation
+      5- if confirmed send request to salla
+      */
+      const cardElement = getCardElement(icon);
+      const keywordsElement = cardElement.querySelector('.keywords-input');
+      const keywords = keywordsElement.querySelector('input[type="text"]').value;
+      let { product, editUrl } = cardElement.dataset
+      const textElement = icon.parentElement.querySelector('p');
+      const { promptType } = icon.parentElement.dataset;
+      product = JSON.parse(product);
+      const request = postMethod({
+        product_id: product.id,
+        product_name: product.name,
+        keywords: keywords.trim(),
+        prompt_type: promptType,
+      })
 
-      EditingParentElement.appendChild(editInput)
-      resetTextInputField(editInput.querySelector('input'))
+      if (!keywords.trim()) {
+        keywordsElement.querySelector('#error-msg').classList.remove('hidden');
+        keywordsElement.querySelector('input[type="text"]').classList.add('border-red-500');
+        iconUnloading();
+        return;
+      } else {
+        keywordsElement.querySelector('#error-msg').classList.add('hidden');
+        keywordsElement.querySelector('input[type="text"]').classList.remove('border-red-500');
+      }
+      
 
-      iconUnloading();
+      fetch(editUrl, request)
+        .then((response) => response.json())
+        .then((data) => {
+          const oldText = textElement.innerText;
+
+          textElement.innerText = data.description;
+          icon.parentElement.appendChild(
+            getTakeOrLeaveElement(textElement, oldText)
+          );
+        })
+        .catch((error) => console.error(error))
+        .finally(() => {
+          iconUnloading();
+        });
+
+    } else if (isEditAllAction) {
+      // get not-processed fields 
+      // if all processed then show message
+      // make the magic icon to loading
+      // click magic icons one by one
     }
 
   });
-});
-
-editInput.querySelector('button').addEventListener('click', () => {
-  const cardElement = getCardElement(editInput);
-  const textElement = editInput.parentElement.querySelector('p');
-  const icon = editInput.querySelector('i');
-
-  const isAlreadyClicked = icon.classList.contains("fa-spinner");
-  if (isAlreadyClicked)
-    return;
-
-  const iconUnloading = iconToLoading(icon);
-
-  let { product, editUrl } = cardElement.dataset
-  product = JSON.parse(product);
-
-  const request = postMethod({
-    product_id: product.id,
-    product_name: product.name,
-    keywords: editInput.querySelector('input').value,
-    prompt_type: editInput.parentElement.dataset.promptType,
-  })
-
-  fetch(editUrl, request)
-    .then((response) => response.json())
-    .then((data) => {
-      const oldText = textElement.innerText;
-
-      textElement.innerText = data.description;
-      editInput.parentElement.appendChild(
-        getTakeOrLeaveElement(textElement, oldText)
-      );
-    })
-    .catch((error) => console.error(error))
-    .finally(() => {
-      editInput.remove();
-      iconUnloading();
-    });
 });
 
