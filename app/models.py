@@ -46,6 +46,7 @@ class SallaUser(AbstractBaseUser):
 
         return user
 
+
 class Account(models.Model):
     # Send to frontend to authenticate with
     public_token = models.CharField(
@@ -149,7 +150,8 @@ class SallaStore(models.Model):
         return self.salla_id
 
 
-class ChatGPTLog(models.Model):
+class ChatGPTResponse(models.Model):
+    # Rename to ChatGPTResponse
     prompt = models.CharField(max_length=512)
     total_tokens = models.PositiveSmallIntegerField(default=0)
     answer = models.TextField()
@@ -167,17 +169,20 @@ class UserPrompt(models.Model):
     user = models.ForeignKey(
         SallaUser, on_delete=models.CASCADE, related_name='prompts'
     )
-    chat_gpt_log = models.OneToOneField(
-        'app.ChatGPTLog', on_delete=models.CASCADE, related_name='user_prompt'
+    # rename to chat_gpt_response
+    chat_gpt_response = models.OneToOneField(
+        'app.ChatGPTResponse', on_delete=models.CASCADE, related_name='user_prompt'
     )
     # it may contain data about the product user asked about
     meta = models.JSONField(default=dict)
+    # product_id
+    # prompt_type
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.user }: {self.chat_gpt_log.prompt}'
+        return f'{self.user }: {self.chat_gpt_response.prompt}'
 
 
 class SallaWebhookLog(models.Model):
