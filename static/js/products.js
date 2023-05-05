@@ -46,7 +46,7 @@ function getTakeOrLeaveElement(textElement, oldText){
 function createDescriptionPopupListItem(description) {
   const descriptionElement = createElement(`
         <div class="description-item mb-8 pb-5 border-b-2 border-solid">
-            <span>${description.chat_gpt_log.answer}</span>
+            <span>${description.chat_gpt_response.answer}</span>
             <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
         </div>
     `);

@@ -14,7 +14,7 @@ from rest_framework.exceptions import MethodNotAllowed
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter, SallaWebhook
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
-from app.models import Account, UserPrompt, ChatGPTLog, SallaUser
+from app.models import Account, UserPrompt, ChatGPTResponse, SallaUser
 from app.utils import set_cookie, validate_email_and_password
 from app.enums import CookieKeys
 from app import serializers
@@ -121,7 +121,7 @@ class AskGPTAboutProductAPI(APIView):
 
         return data
 
-    def ask_chat_gpt(self, data: dict) -> ChatGPTLog:
+    def ask_chat_gpt(self, data: dict) -> ChatGPTResponse:
         prompt_generator = ChatGPTProductPromptGenerator(data)
         chat_gpt = ChatGPT().ask(prompt_generator.get_prompt())
         return chat_gpt
@@ -129,7 +129,7 @@ class AskGPTAboutProductAPI(APIView):
     def post(self, request):
         data = self.get_data(request)
         chat_gpt = self.ask_chat_gpt(data)
-        UserPrompt.objects.create(user=request.user, chat_gpt_log=chat_gpt, meta=data)
+        UserPrompt.objects.create(user=request.user, chat_gpt_response=chat_gpt, meta=data)
 
         return Response({'description': chat_gpt.answer})
 

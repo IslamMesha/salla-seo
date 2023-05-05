@@ -38,14 +38,14 @@ class SallaStoreSerializer(serializers.ModelSerializer):
         }
 
 
-class ChatGPTLogSerializer(serializers.ModelSerializer):
+class ChatGPTResponseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.ChatGPTLog
+        model = models.ChatGPTResponse
         fields = '__all__'
 
 
 class UserPromptSerializer(serializers.ModelSerializer):
-    chat_gpt_log = ChatGPTLogSerializer(read_only=True)
+    chat_gpt_response = ChatGPTResponseSerializer(read_only=True)
     class Meta:
         model = models.UserPrompt
         fields = '__all__'
@@ -82,7 +82,7 @@ class ChatGPTResponseSerializer(serializers.Serializer):
         return obj['choices'][0]['text'].strip()
 
     def save(self, **kwargs):
-        return models.ChatGPTLog.objects.create(**self.data)
+        return models.ChatGPTResponse.objects.create(**self.data)
 
 
 class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):

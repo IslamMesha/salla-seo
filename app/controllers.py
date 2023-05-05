@@ -6,7 +6,7 @@ from django.shortcuts import reverse
 from rest_framework.serializers import Serializer
 
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
-from app.models import Account, ChatGPTLog, SallaUser
+from app.models import Account, ChatGPTResponse, SallaUser
 from app import utils
 from app.enums import WebhookEvents
 
@@ -191,7 +191,7 @@ class ChatGPT:
 
         self.openai = openai
 
-    def __log_to_db(self, prompt: str, response: dict) -> ChatGPTLog:
+    def __log_to_db(self, prompt: str, response: dict) -> ChatGPTResponse:
         from app.serializers import ChatGPTResponseSerializer
 
         response.update({'prompt': prompt})
@@ -201,7 +201,7 @@ class ChatGPT:
 
         return serializer.save()
 
-    def ask(self, prompt: str) -> ChatGPTLog:
+    def ask(self, prompt: str) -> ChatGPTResponse:
         openai_model = os.getenv('OPENAI_MODEL', 'text-davinci-003')
         openai_max_token = int(os.getenv('OPENAI_MAX_TOKEN', 512))
 
