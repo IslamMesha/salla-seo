@@ -1,3 +1,4 @@
+import os
 import time
 
 from django.db import models
@@ -111,14 +112,21 @@ class Account(models.Model):
         from app.controllers import SallaMerchantReader
         from SiteServe.models import StaticPage
 
-        products = SallaMerchantReader(self).get_products(params)
         context = {
             'user': self.user,
-            'products': products['data'],
-            'pagination': products['pagination'],
             'is_authenticated': True,
-            'nav_pages': StaticPage.get_nav_pages()
+            'nav_pages': StaticPage.get_nav_pages(),   
         }
+
+        if os.getenv('IS_LOCAL', False) == 'True':
+            from app.utils import get_static_products
+            context.update(get_static_products())
+        else:
+            products = SallaMerchantReader(self).get_products(params)
+            context.update({
+                'products': products['data'],
+                'pagination': products['pagination'],
+            })
 
         return context
 
