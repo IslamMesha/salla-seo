@@ -1,0 +1,93 @@
+<div class="toggels flex flex-col items-end mt-5">
+  <div
+    id="toggle-processed-cards"
+    class="flex items-center cursor-pointer mt-3"
+  >
+    <div class="relative">
+      <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+      <div
+        class="circle transition-all absolute inset-y-0 w-6 h-6 bg-orange-500 rounded-full shadow transition-transform transform translate-x-0"
+        style="top: 50%; transform: translateY(-50%)"
+      ></div>
+    </div>
+    <p class="ml-3 font-bold text-lg text-gray-600">أخفاء المنتجات المنتهية</p>
+  </div>
+
+  <div
+    id="toggle-processed-sections"
+    class="flex items-center cursor-pointer mt-3"
+  >
+    <div class="relative">
+      <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+      <div
+        class="circle transition-all absolute inset-y-0 w-6 h-6 bg-orange-500 rounded-full shadow transition-transform transform translate-x-0"
+        style="top: 50%; transform: translateY(-50%)"
+      ></div>
+    </div>
+    <p class="ml-3 font-bold text-lg text-gray-600">
+      أخفاء الاجزاء المنتهية علي حدي
+    </p>
+  </div>
+</div>
+
+<script>
+  const toggleProcessedCards = document.getElementById(
+    "toggle-processed-cards"
+  );
+  const toggleProcessedSections = document.getElementById(
+    "toggle-processed-sections"
+  );
+
+  toggleProcessedCards.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    const products = document.querySelectorAll(".product");
+    const circle = toggleProcessedCards.querySelector(".circle");
+    const on = circle.classList.contains("right-0");
+
+    if (on) {
+      circle.classList.remove("right-0");
+      toggleProcessedCards.querySelector("p").innerText =
+        "أخفاء المنتجات المنتهية";
+
+      document
+        .querySelectorAll(".product[data-is-fully-processed='true']")
+        .forEach((elm) => {
+          elm.classList.remove("hidden");
+        });
+    } else {
+      circle.classList.add("right-0");
+      toggleProcessedCards.querySelector("p").innerText =
+        "إظهار المنتجات المنتهية";
+
+      document
+        .querySelectorAll(".product[data-is-fully-processed='true']")
+        .forEach((elm) => {
+          elm.classList.add("hidden");
+        });
+    }
+  });
+
+  toggleProcessedSections.addEventListener("click", (e) => {
+    const circle = toggleProcessedSections.querySelector(".circle");
+    const on = circle.classList.contains("right-0");
+
+    if (on) {
+      circle.classList.remove("right-0");
+      toggleProcessedSections.querySelector("p").innerText =
+        "أخفاء الاجزاء المنتهية علي حدي";
+
+      document.querySelectorAll("[data-is-processed='true']").forEach((elm) => {
+        elm.classList.remove("hidden");
+      });
+    } else {
+      circle.classList.add("right-0");
+      toggleProcessedSections.querySelector("p").innerText =
+        "إظهار الاجزاء المنتهية علي حدي";
+
+      document.querySelectorAll("[data-is-processed='true']").forEach((elm) => {
+        elm.classList.add("hidden");
+      });
+    }
+  });
+</script>
