@@ -9,6 +9,7 @@
   data-edit-url="{% url 'app:ask_gpt' %}"
   data-salla-submit-url="{% url 'app:salla_submit' %}"
   data-prompt-decline-url="{% url 'app:prompt_decline' %}"
+  data-is-fully-processed="{{ product.is_fully_processed|boolean|to_json }}"
 >
   <div class="product-image image-container">
     <img
