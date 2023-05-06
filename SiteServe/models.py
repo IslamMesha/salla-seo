@@ -89,7 +89,7 @@ class ChatGPTPromptTemplate(models.Model):
     NAME_FORMAT = 'product_{type}_{language}'
 
     template = models.TextField(f'Allowed labels are {ALLOWED_TEMPLATE_LABELS()} || Keep in mind the DEPENDENCIES when choose the labels.')
-    type = models.CharField(max_length=200, choices=CHATGPT_PROMPT_TYPES())
+    type = models.CharField(max_length=32, choices=CHATGPT_PROMPT_TYPES())
     language = models.CharField(max_length=2, choices=CHATGPT_PROMPT_LANGUAGES())
     is_active = models.BooleanField(default=False)
 
