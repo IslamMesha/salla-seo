@@ -1,7 +1,7 @@
 import os
 import logging
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
 from rest_framework.views import APIView
@@ -123,15 +123,25 @@ class AskGPTAboutProductAPI(APIView):
 
     def ask_chat_gpt(self, data: dict) -> ChatGPTResponse:
         prompt_generator = ChatGPTProductPromptGenerator(data)
-        chat_gpt = ChatGPT().ask(prompt_generator.get_prompt())
-        return chat_gpt
+        prompt = prompt_generator.get_prompt()
+
+        return ChatGPT().ask(prompt)
 
     def post(self, request):
         data = self.get_data(request)
-        chat_gpt = self.ask_chat_gpt(data)
-        UserPrompt.objects.create(user=request.user, chat_gpt_response=chat_gpt, meta=data)
+        chat_gpt_response = self.ask_chat_gpt(data)
+        prompt = UserPrompt.objects.create(
+            user=request.user,
+            chat_gpt_response=chat_gpt_response,
+            meta=data,
+            product_id=data['product_id'],
+            prompt_type=data['prompt_type'],
+        )
 
-        return Response({'description': chat_gpt.answer})
+        return Response({
+            'prompt_id': prompt.id,
+            'answer': chat_gpt_response.answer,
+        })
 
 
 class SubmitToSallaAPI(APIView):
@@ -145,22 +155,33 @@ class SubmitToSallaAPI(APIView):
         return data
 
     def post(self, request):
-        account = request.user.account
+        user = request.user
         data = self.get_data(request)
 
-        salla_key_name = {
-            ChatGPTProductPromptGenerator.Types.TITLE: 'name',
-            ChatGPTProductPromptGenerator.Types.DESCRIPTION: 'description',
-            ChatGPTProductPromptGenerator.Types.SEO_TITLE: 'metadata_title',
-            ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION: 'metadata_description',
-        }.get(data['prompt_type'])
+        prompt = get_object_or_404(user.prompts.all(), pk=data['prompt_id'])
+        response = prompt.write_to_salla()
 
-        body = {salla_key_name: data['new_value']}
+        # TODO make use of response
+        return Response({'new_value': prompt.chat_gpt_response.answer})
 
-        writer = SallaWriter(account)
-        writer.product_update(data['product_id'], body)
 
-        return Response({'new_value': data['new_value']})
+class PromptDeclineAPI(APIView):
+    post_body_serializer = serializers.ProductUpdatePOSTBodySerializer
+
+    def get_data(self, request) -> dict:
+        serializer = self.post_body_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        return data
+
+    def post(self, request):
+        data = self.get_data(request)
+
+        prompt = get_object_or_404(request.user.prompts.all(), pk=data['prompt_id'])
+        prompt.decline()
+
+        return Response(status=200)
 
 
 class ProductListHistoryAPI(ListAPIView):
