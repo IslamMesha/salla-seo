@@ -1,5 +1,6 @@
 import os
 import time
+from typing import List, Tuple
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
@@ -136,6 +137,15 @@ class Account(models.Model):
                 'pagination': products['pagination'],
             })
 
+        # update products with prompts count
+        products = context['products']
+
+        products_ids = [product['id'] for product in products]
+        prompts = UserPrompt.get_products_prompts_report(products_ids)
+        prompts = { prompt['product_id']: prompt for prompt in prompts }
+        for product in products:
+            product['prompts'] = prompts.get(product['id'], {})
+
         return context
 
     def __str__(self):
@@ -241,6 +251,20 @@ class UserPrompt(models.Model):
         self.is_accepted = True
         self.save()
 
+    @classmethod
+    def get_products_prompts_report(cls, product_ids: List[str]) -> Tuple[dict]:
+        from app.controllers import ChatGPTProductPromptGenerator
+
+        types = ChatGPTProductPromptGenerator.get_prompt_types()
+        annotate_fields = {
+            prompt_type: models.Count('id', filter=models.Q(prompt_type=prompt_type))
+            for prompt_type in types
+        }
+
+        prompts = cls.objects.filter(product_id__in=product_ids)
+        prompts = prompts.values('product_id').annotate(**annotate_fields)
+
+        return tuple(prompts)
 
 
 class SallaWebhookLog(models.Model):
