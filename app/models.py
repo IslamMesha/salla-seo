@@ -144,7 +144,9 @@ class Account(models.Model):
         prompts = UserPrompt.get_products_prompts_report(products_ids)
         prompts = { prompt['product_id']: prompt for prompt in prompts }
         for product in products:
-            product['prompts'] = prompts.get(product['id'], {})
+            product_prompts = prompts.get(product['id'], {})
+            product['prompts'] = product_prompts
+            product['is_fully_processed'] = product_prompts and all(product_prompts.values())
 
         return context
 
