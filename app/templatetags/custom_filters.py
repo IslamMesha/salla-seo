@@ -21,5 +21,8 @@ def minus(number):
 def plus(number):
     return int(number) + 1
 
+@register.filter 
+def boolean(x):
+    return bool(x)
 
 
