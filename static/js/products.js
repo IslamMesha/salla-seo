@@ -1,7 +1,7 @@
 const productIcons = document.querySelectorAll(".product i");
 const productKeywordInputs = document.querySelectorAll(".product .keywords-input");
 
-function getTakeOrLeaveElement(textElement, oldText){
+function getTakeOrLeaveElement(textElement, oldText, prompt_id){
   // NOTE textElement already has the new text
 
   const elm = createElement(`
@@ -16,30 +16,28 @@ function getTakeOrLeaveElement(textElement, oldText){
   `);
   elm.querySelector('.accept').addEventListener('click', () => {
     const cardElement = getCardElement(textElement);
-    let { product, sallaSubmitUrl } = cardElement.dataset;
-    product = JSON.parse(product);
-    const request = postMethod({
-      product_id: product.id,
-      prompt_type: textElement.parentElement.dataset.promptType,
-      new_value: textElement.innerText,
-    });
+    let { sallaSubmitUrl } = cardElement.dataset;
 
-    fetch(sallaSubmitUrl, request)
-      .then((response) => response.json())
-      .then((data) => {})
+    fetch(sallaSubmitUrl, postMethod({ prompt_id }))
       .catch((error) => console.error(error))
       .finally(() => elm.remove());
   });
 
-  if(oldText){
-    elm.querySelector('.cancelled').addEventListener('click', () => {
+  elm.querySelector('.cancelled').addEventListener('click', () => {
+    const cardElement = getCardElement(textElement);
+    const { promptDeclineUrl } = cardElement.dataset;
+
+    fetch(promptDeclineUrl, postMethod({ prompt_id }))
+      .catch((error) => console.error(error))
+      .finally(() => elm.remove());
+
+    if(oldText){
       textElement.innerText = oldText;
       elm.remove();
-    });
-  } else {
-    elm.querySelector('.cancelled').classList.add('hidden')
-  }
+    }
+  });
 
+  if(oldText){} else { elm.querySelector('.cancelled').classList.add('hidden') }
   return elm;
 }
 
@@ -162,16 +160,15 @@ productIcons.forEach((icon) => {
         keywordsElement.querySelector('#error-msg').classList.add('hidden');
         keywordsElement.querySelector('input[type="text"]').classList.remove('border-red-500');
       }
-      
 
       fetch(editUrl, request)
         .then((response) => response.json())
-        .then((data) => {
+        .then(({ answer, prompt_id }) => {
           const oldText = textElement.innerText;
 
-          textElement.innerText = data.description;
+          textElement.innerText = answer;
           icon.parentElement.appendChild(
-            getTakeOrLeaveElement(textElement, oldText)
+            getTakeOrLeaveElement(textElement, oldText, prompt_id)
           );
         })
         .catch((error) => console.error(error))
