@@ -8,6 +8,14 @@ from app import utils
 from app import managers
 
 
+def CHATGPT_PROMPT_TYPES():
+    from app.controllers import ChatGPTProductPromptGenerator
+    from app.utils import list_to_choices
+
+    types = ChatGPTProductPromptGenerator.get_prompt_types()
+    return list_to_choices(types)
+
+
 class SallaUser(AbstractBaseUser):
     # TODO in callback check if user exists using the salla_id
     salla_id = models.CharField(max_length=64, unique=True, db_index=True)
@@ -182,15 +190,57 @@ class UserPrompt(models.Model):
         'app.ChatGPTResponse', on_delete=models.CASCADE, related_name='user_prompt'
     )
     # it may contain data about the product user asked about
+    # TODO rename meta to payload
     meta = models.JSONField(default=dict)
-    # product_id
-    # prompt_type
+
+    product_id = models.CharField(max_length=64, db_index=True)
+    prompt_type = models.CharField(max_length=32, choices=CHATGPT_PROMPT_TYPES())
+
+    is_accepted = models.BooleanField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def acceptance_emoji(self):
+        return {
+            True: '✅',
+            False: '❌',   
+        }.get(self.is_accepted, '🤷‍♂️')
+
+    @property
+    def salla_understandable_key(self) -> str:
+        '''How salla understands the key in the body'''
+        from app.controllers import ChatGPTProductPromptGenerator
+
+        return {
+            ChatGPTProductPromptGenerator.Types.TITLE: 'name',
+            ChatGPTProductPromptGenerator.Types.DESCRIPTION: 'description',
+            ChatGPTProductPromptGenerator.Types.SEO_TITLE: 'metadata_title',
+            ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION: 'metadata_description',
+        }.get(self.prompt_type)
+
     def __str__(self):
-        return f'{self.user }: {self.chat_gpt_response.prompt}'
+        return f'{self.user }: {self.chat_gpt_response.prompt} ({self.acceptance_emoji})'
+
+    def write_to_salla(self):
+        from app.controllers import SallaWriter
+
+        payload = { self.salla_understandable_key: self.chat_gpt_response.answer }
+        salla_writer = SallaWriter(self.user.account)
+        response = salla_writer.product_update(self.product_id, payload)
+
+        self.accepted()
+        return response
+
+    def decline(self) -> None:
+        self.is_accepted = False
+        self.save()
+
+    def accepted(self) -> None:
+        self.is_accepted = True
+        self.save()
+
 
 
 class SallaWebhookLog(models.Model):
