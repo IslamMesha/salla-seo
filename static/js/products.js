@@ -146,7 +146,12 @@ productIcons.forEach((icon) => {
       product = JSON.parse(product);
       const request = postMethod({
         product_id: product.id,
+        // NOTE this may cause issue when user edit the product but not refresh the page
         product_name: product.name,
+        product_description: product.description,
+        product_seo_title: product.metadata.title,
+        brand_name: product.brand,
+        // more data
         keywords: keywords.trim(),
         prompt_type: promptType,
       })

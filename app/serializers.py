@@ -87,9 +87,12 @@ class ChatGPTResponseSerializer(serializers.Serializer):
 
 class ProductGetDescriptionPOSTBodySerializer(serializers.Serializer):
     # Those will be used as values in the chatgpt templates
-    product_id = serializers.CharField(source='id')
-    product_name = serializers.CharField(source='name')
-    keywords = serializers.CharField(required=False)
+    product_id = serializers.CharField(required=True)
+    product_name = serializers.CharField(required=True)
+    product_description = serializers.CharField(required=True)
+    product_seo_title = serializers.CharField(required=True)
+    brand_name = serializers.CharField(required=True)
+    keywords = serializers.CharField(required=True)
 
     prompt_type = serializers.ChoiceField(required=True, choices=PROMPT_TYPES())
 
