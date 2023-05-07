@@ -1,11 +1,10 @@
 const productIcons = document.querySelectorAll(".product i");
-const productKeywordInputs = document.querySelectorAll(".product .keywords-input");
 
 function getTakeOrLeaveElement(textElement, oldText, prompt_id){
   // NOTE textElement already has the new text
 
   const elm = createElement(`
-    <div class="flex justify-center space-x-2 space-x-reverse mb-4">
+    <div class="prompt-confirmation flex justify-center space-x-2 space-x-reverse mb-4">
       <button type="button" class="accept w-6 h-6 text-xs text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none">
         <i class="fas fa-check"></i>
       </button>
@@ -133,10 +132,6 @@ productIcons.forEach((icon) => {
         .catch((error) => console.log(error))
         .finally(() => iconUnloading());
     } else if (isEditAction) {
-      /*
-      4- show the new text in the text element and ask for confirmation
-      5- if confirmed send request to salla
-      */
       const cardElement = getCardElement(icon);
       const keywordsElement = cardElement.querySelector('.keywords-input');
       const keywords = keywordsElement.querySelector('input[type="text"]').value;
@@ -155,6 +150,13 @@ productIcons.forEach((icon) => {
         keywords: keywords.trim(),
         prompt_type: promptType,
       })
+
+      const isHasConfirmationPrompt = Boolean(icon.parentElement.querySelector('.prompt-confirmation'));
+
+      if (isHasConfirmationPrompt) {
+        iconUnloading();
+        return
+      }
 
       if (!keywords.trim()) {
         keywordsElement.querySelector('#error-msg').classList.remove('hidden');
@@ -182,10 +184,26 @@ productIcons.forEach((icon) => {
         });
 
     } else if (isEditAllAction) {
-      // get not-processed fields 
-      // if all processed then show message
-      // make the magic icon to loading
-      // click magic icons one by one
+      const cardElement = getCardElement(icon);
+      const keywordsElement = cardElement.querySelector('.keywords-input');
+      const keywords = keywordsElement.querySelector('input[type="text"]').value;
+
+      if (!keywords.trim()) {
+        keywordsElement.querySelector('#error-msg').classList.remove('hidden');
+        keywordsElement.querySelector('input[type="text"]').classList.add('border-red-500');
+        iconUnloading();
+        return;
+      } else {
+        keywordsElement.querySelector('#error-msg').classList.add('hidden');
+        keywordsElement.querySelector('input[type="text"]').classList.remove('border-red-500');
+      }
+
+      cardElement
+        .querySelectorAll('[data-is-processed="false"] .fa-magic')
+        .forEach(magicIcon => {
+          magicIcon.click();
+          setTimeout(iconUnloading, 200);
+        });
     }
 
   });
