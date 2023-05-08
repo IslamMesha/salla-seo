@@ -20,12 +20,15 @@ class SallaOAuth:
 
     @property
     def redirect_uri(self):
-        if self.base_url is None:
-            uri = os.environ.get('SALLA_OAUTH_CLIENT_REDIRECT_URI')
-        else:
-            uri = self.base_url.rstrip('/') + reverse('app:oauth_callback')
+        # if self.base_url is None:
+        #     uri = os.environ.get('SALLA_OAUTH_CLIENT_REDIRECT_URI')
+        # else:
+        #     uri = self.base_url.rstrip('/') + reverse('app:oauth_callback')
 
-        return uri
+        # return uri
+        if os.getenv('IS_LOCAL') == 'True':
+            return 'http://127.0.0.1:8000/oauth/callback/'
+        return 'https://tafaseel.io/oauth/callback/'
 
     def get_installation_url(self):
         return f'https://s.salla.sa/apps/install/{self.app_id}'
