@@ -297,12 +297,12 @@ class SallaWebhook:
         email = settings.get('email')
         if email:
             self.salla_user.email = email
-            self.salla_user.save()
 
         password = settings.get('password')
         if password:
-            self.salla_user.set_password(password)
+            self.salla_user.password = password
 
+        self.salla_user.save()
         return {'status': 'success'}
 
     def __log_to_db(self, response: dict) -> None:
