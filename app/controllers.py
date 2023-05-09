@@ -1,8 +1,6 @@
 import os
 import requests
 
-from django.shortcuts import reverse
-
 from rest_framework.serializers import Serializer
 
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException

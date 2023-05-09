@@ -12,7 +12,7 @@ from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.views import exception_handler as drf_exception_handler
 from rest_framework.exceptions import MethodNotAllowed
 
-from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWriter, SallaWebhook
+from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWebhook
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
 from app.models import Account, UserPrompt, ChatGPTResponse, SallaUser
 from app.utils import set_cookie, validate_email_and_password
@@ -219,10 +219,6 @@ class WebhookAPI(APIView):
     def post(self, request):
         response, status_code = SallaWebhook(request.data).process()
         return Response(response, status=status_code)
-
-
-from django.core.validators import validate_email
-from django.contrib.auth.password_validation import validate_password
 
 
 class SettingsValidationAPI(APIView):
