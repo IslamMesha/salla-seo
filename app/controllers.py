@@ -274,15 +274,16 @@ class SallaWebhook:
 
     def __setup(self) -> dict:
         self.salla_user = self.__get_salla_user()
-        self.events_map = {
+        self.event_handler = {
             WebhookEvents.AUTHORIZED.value: self.__authorized,
             WebhookEvents.SETTINGS_UPDATED.value: self.__settings_updated,
-        }
-        self.event_handler = self.events_map.get(self.event)
+        }.get(self.event)
+
         assert self.event_handler is not None, f'Event `{self.event}` not found.'
 
     def __get_salla_user(self) -> Account:
-        return SallaUser.objects.filter(merchant__id=self.merchant_id).first()
+        # return SallaUser.objects.filter(merchant__id=self.merchant_id).first()
+        return SallaUser.objects.filter(store__salla_id=self.merchant_id).first()
 
     def __authorized(self) -> dict:
         Account.store(self.data)
@@ -291,12 +292,14 @@ class SallaWebhook:
     def __settings_updated(self) -> dict:
         assert self.salla_user is not None, 'Salla user not found.'
 
-        email = self.data.get('email')
+        settings = self.data.get('settings')
+
+        email = settings.get('email')
         if email:
             self.salla_user.email = email
             self.salla_user.save()
 
-        password = self.data.get('password')
+        password = settings.get('password')
         if password:
             self.salla_user.set_password(password)
 
