@@ -47,12 +47,12 @@
     <div data-prompt-type="title" data-is-processed="{{ product.prompts.title|boolean|to_json }}">
       <label class="text-gray-400 font-bold mb-2 text-xs">اسم المنتج</label>
       {% include 'components/product_card_icons.html' %}
-      <p class="product-seo-title break-all mb-3">{{ product.name }}</p>
+      <p class="product-seo-title break-words mb-3">{{ product.name }}</p>
     </div>
     <div data-prompt-type="description" data-is-processed="{{ product.prompts.description|boolean|to_json }}">
       <label class="text-gray-400 font-bold mb-2 text-xs">وصف المنتج</label>
       {% include 'components/product_card_icons.html' %}
-      <p class="product-description text-sm break-all">
+      <p class="product-description text-sm break-words">
         {{ product.description }}
       </p>
     </div>
@@ -66,7 +66,7 @@
         >عنوان السيو (الخاص بمحرك البحث)</label
       >
       {% include 'components/product_card_icons.html' %}
-      <p class="product-seo-title break-all mb-3">
+      <p class="product-seo-title break-words mb-3">
         {% if product.metadata.title %} {{ product.metadata.title }} {% else %}
         غير معرف {% endif %}
       </p>
@@ -75,7 +75,7 @@
       <label class="text-gray-400 font-bold mb-2 text-xs"
         >وصف السيو (الخاص بمحرك البحث)</label>
       {% include 'components/product_card_icons.html' %}
-      <p class="product-seo-description break-all">
+      <p class="product-seo-description break-words">
         {% if product.metadata.description %} {{ product.metadata.description}}
         {% else %} غير معرف {% endif %}
       </p>
