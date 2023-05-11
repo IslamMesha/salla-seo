@@ -150,7 +150,7 @@ productIcons.forEach((icon) => {
         keywords: keywords.trim(),
         prompt_type: promptType,
       })
-
+      console.log(request)
       const isHasConfirmationPrompt = Boolean(icon.parentElement.querySelector('.prompt-confirmation'));
 
       if (isHasConfirmationPrompt) {
@@ -208,4 +208,18 @@ productIcons.forEach((icon) => {
 
   });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  document.querySelectorAll('[data-is-processed="true"]').forEach(elm => {
+    const textElement = elm.querySelector('p');
+    textElement.appendChild(
+      createElement(`<span title="Processed" class="cursor-default">✅</span>`)
+    );
+  });
+
+
+});
+
 
