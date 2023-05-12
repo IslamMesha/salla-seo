@@ -129,6 +129,15 @@ class ChatGPTPromptTemplate(models.Model):
         DEFAULT_PROMPTS = {
             'PRODUCT_DESCRIPTION_EN': 'write a brief about product {product_name}, using these keywords: {keywords}',
             'PRODUCT_DESCRIPTION_AR': 'اكتب ملخصاً قصير عن منتج أسمه: {product_name}, باستخدام تلك الكلمات المفتاحية: {keywords}',
+
+            'PRODUCT_TITLE_EN': 'write a title for product {product_name}, using these keywords: {keywords}',
+            'PRODUCT_TITLE_AR': 'اكتب عنواناً لمنتج أسمه: {product_name}, باستخدام تلك الكلمات المفتاحية: {keywords}',
+
+            'PRODUCT_SEO_TITLE_EN': 'write a title good seo about product {product_name}, using these keywords: {keywords}',
+            'PRODUCT_SEO_TITLE_AR': 'اكتب عنواناً مناسب لمحركات البحث لمنتج أسمه: {product_name}, باستخدام تلك الكلمات المفتاحية: {keywords}',
+
+            'PRODUCT_SEO_DESCRIPTION_EN': 'write a SEO description about product {product_name}, using these keywords: {keywords}',
+            'PRODUCT_SEO_DESCRIPTION_AR': 'اكتب ملخصاً قصير مناسب لمحركات البحث عن منتج أسمه: {product_name}, باستخدام تلك الكلمات المفتاحية: {keywords}',
         }
 
         db_prompts = {
