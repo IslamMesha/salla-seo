@@ -150,7 +150,7 @@ productIcons.forEach((icon) => {
         keywords: keywords.trim(),
         prompt_type: promptType,
       })
-      console.log(request)
+
       const isHasConfirmationPrompt = Boolean(icon.parentElement.querySelector('.prompt-confirmation'));
 
       if (isHasConfirmationPrompt) {
@@ -198,12 +198,21 @@ productIcons.forEach((icon) => {
         keywordsElement.querySelector('input[type="text"]').classList.remove('border-red-500');
       }
 
-      cardElement
-        .querySelectorAll('[data-is-processed="false"] .fa-magic')
-        .forEach(magicIcon => {
-          magicIcon.click();
-          setTimeout(iconUnloading, 200);
-        });
+      const notProcessedElements = cardElement.querySelectorAll('[data-is-processed="false"] .fa-magic');
+      notProcessedElements.forEach( magicIcon => magicIcon.click() );
+      const iconLoadingInterval = setInterval(() => {
+
+        const isStillLoading = Array.from(notProcessedElements).filter(magicIcon => {
+          return magicIcon.classList.contains('fa-spinner');
+        })
+        console.log(isStillLoading)
+        if (isStillLoading.length > 0) return;
+        else{
+          iconUnloading();
+          clearInterval(iconLoadingInterval);
+        }
+
+      }, 200);
     }
 
   });
