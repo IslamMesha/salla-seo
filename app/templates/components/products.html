@@ -9,4 +9,57 @@
 </div>
 
 {% include 'components/pagination.html' %}
+
 <script src="{% static 'js/products.js' %}" defer></script>
+<script src="https://unpkg.com/keyboard-actions@latest"></script>
+
+<script>
+function goThrowKeywordInputByTabButton(){
+  const kb = new KeyboardActions();
+  const products = document.querySelectorAll('.product');
+
+  kb.showClickedButtonName();
+
+
+  let index = 0;
+  kb.assignKeyAction('Tab', (e) => {
+    const input = products[index].querySelector('.keywords-input input');
+    const end = input.value.length;
+
+    input.setSelectionRange(end, end);
+    input.value = input.value.trim() + ' ';
+    input.focus();
+
+    console.log(index, products.length)
+
+    // cycle through products
+    if (index === products.length-1) {
+      index = 0;
+    } else {
+      index++;
+    }
+  });
+
+  kb.assignKeyAction("Tab", kb.prevent);
+}
+
+function submitKeywordButtonOnEnter(){
+  const keywordInputs = document.querySelectorAll('.keywords-input input');
+  keywordInputs.forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        input.parentElement.querySelector('button i').click();
+      }
+    })
+  });
+}
+
+goThrowKeywordInputByTabButton();
+submitKeywordButtonOnEnter();
+</script>
+
+<style>
+  .keywords-input input:focus {
+    border: 2px solid green;
+  }
+</style>
