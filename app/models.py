@@ -281,7 +281,7 @@ class SallaWebhookLog(models.Model):
     def __str__(self):
         status = self.response.get('status', 'unknown')
         emoji = '✅' if status == 'success' else '❌'
-        return f'{emoji} {self.event} - {self.merchant_id}'
+        return f'({self.id}) - {emoji} {self.event} - {self.merchant_id}'
 
 
 
