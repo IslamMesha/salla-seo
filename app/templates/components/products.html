@@ -14,30 +14,24 @@
 <script src="https://unpkg.com/keyboard-actions@latest"></script>
 
 <script>
+let focusedKeywordInputIndex = -1;
+
 function goThrowKeywordInputByTabButton(){
   const kb = new KeyboardActions();
   const products = document.querySelectorAll('.product');
 
-  kb.showClickedButtonName();
-
-
-  let index = 0;
   kb.assignKeyAction('Tab', (e) => {
-    const input = products[index].querySelector('.keywords-input input');
+    const input = products[++focusedKeywordInputIndex].querySelector('.keywords-input input');
     const end = input.value.length;
 
     input.setSelectionRange(end, end);
     input.value = input.value.trim() + ' ';
     input.focus();
 
-    console.log(index, products.length)
-
     // cycle through products
-    if (index === products.length-1) {
-      index = 0;
-    } else {
-      index++;
-    }
+    if (focusedKeywordInputIndex === products.length-1)
+      focusedKeywordInputIndex = -1;
+
   });
 
   kb.assignKeyAction("Tab", kb.prevent);
@@ -53,6 +47,17 @@ function submitKeywordButtonOnEnter(){
     })
   });
 }
+
+document.querySelectorAll('.keywords-input input').forEach((input, number) => {
+  input.addEventListener('focus', (e) => {
+    
+    focusedKeywordInputIndex = number;
+    
+    const products = document.querySelectorAll('.product');
+    if (focusedKeywordInputIndex === products.length-1)
+      focusedKeywordInputIndex = -1;
+  })
+})
 
 goThrowKeywordInputByTabButton();
 submitKeywordButtonOnEnter();
