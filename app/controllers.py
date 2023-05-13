@@ -277,6 +277,12 @@ class SallaWebhook:
         self.event_handler = {
             WebhookEvents.AUTHORIZED.value: self.__authorized,
             WebhookEvents.SETTINGS_UPDATED.value: self.__settings_updated,
+
+            WebhookEvents.TRIAL_STARTED.value: self.__trial_started,
+            WebhookEvents.TRIAL_EXPIRED.value: self.__trial_expired,
+            WebhookEvents.SUBSCRIPTION_STARTED.value: self.__subscription_started,
+            WebhookEvents.SUBSCRIPTION_EXPIRED.value: self.__subscription_expired,
+            WebhookEvents.SUBSCRIPTION_CANCELLED.value: self.__subscription_cancelled,
         }.get(self.event)
 
         assert self.event_handler is not None, f'Event `{self.event}` not found.'
@@ -303,6 +309,58 @@ class SallaWebhook:
             self.salla_user.password = password
 
         self.salla_user.save()
+        return {'status': 'success'}
+
+    def __get_subscription_payload(self) -> dict:
+        from app.serializers import SallaUserSubscriptionPayloadSerializer
+
+        serializer = SallaUserSubscriptionPayloadSerializer(data=self.data)
+        serializer.is_valid(raise_exception=True)
+
+        return serializer.data
+
+    def __stop_subscriptions(self) -> None:
+        payload = self.__get_subscription_payload()
+
+        self.salla_user.subscriptions.filter(
+            plan_name__iexact=payload['plan_name']
+        ).update(is_active=False)
+
+    def __start_subscriptions(self, is_trial: bool = False):
+        from app.models import SallaUserSubscription
+
+        payload = self.__get_subscription_payload()
+        subscription = SallaUserSubscription(
+            salla_user=self.salla_user,
+            payload=self.data,
+            is_trial=is_trial,
+            **payload
+        )
+        subscription.save()
+        return subscription
+
+    def __trial_started(self) -> dict:        
+        self.__stop_subscriptions()
+        self.__start_subscriptions(is_trial=True)
+
+        return {'status': 'success'}
+
+    def __trial_expired(self) -> dict:
+        self.__stop_subscriptions()
+        return {'status': 'success'}
+
+    def __subscription_started(self) -> dict:
+        self.__stop_subscriptions()        
+        self.__start_subscriptions(is_trial=False)
+
+        return {'status': 'success'}
+
+    def __subscription_expired(self) -> dict:
+        self.__stop_subscriptions()
+        return {'status': 'success'}
+
+    def __subscription_cancelled(self) -> dict:
+        self.__stop_subscriptions()
         return {'status': 'success'}
 
     def __log_to_db(self, response: dict) -> None:
