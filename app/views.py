@@ -11,6 +11,7 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.views import exception_handler as drf_exception_handler
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import IsAuthenticated
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWebhook
 from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
@@ -18,6 +19,7 @@ from app.models import Account, UserPrompt, ChatGPTResponse, SallaUser
 from app.utils import set_cookie, validate_email_and_password
 from app.enums import CookieKeys
 from app import serializers
+from app import permissions
 
 logger = logging.getLogger('main')
 
@@ -112,6 +114,7 @@ class ProductsListAPI(ListAPIView):
 
 
 class AskGPTAboutProductAPI(APIView):
+    permission_classes = [IsAuthenticated, permissions.SallaPlanLimits]
     post_body_serializer = serializers.ProductGetDescriptionPOSTBodySerializer
 
     def get_data(self, request) -> dict:
