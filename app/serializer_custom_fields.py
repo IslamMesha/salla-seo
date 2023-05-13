@@ -10,6 +10,9 @@ class SallaSubscriptionPlanDurationField(serializers.Field):
             return data
 
     def to_representation(self, value):
+        if isinstance(value, timedelta):
+            return value
+
         try:
             duration_in_months = int(value)
             return timedelta(days=duration_in_months*30)
