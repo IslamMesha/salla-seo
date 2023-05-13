@@ -296,6 +296,9 @@ class SallaUserSubscription(models.Model):
 
     payload = models.JSONField(default=dict)
 
+    is_active = models.BooleanField(default=True)
+    is_trial = models.BooleanField(default=False)
+
     # permissions
     gpt_prompts_limit = models.PositiveSmallIntegerField(default=0)
 
@@ -335,6 +338,7 @@ class SallaUserSubscription(models.Model):
 
     def is_alive(self) -> bool:
         return (
+            self.is_active and
             self.plan_period is None or
             self.created_at + self.plan_period > timezone.now()
         )
