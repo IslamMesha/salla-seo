@@ -10,7 +10,7 @@ class SallaOauthFailedException(APIException):
 
 
 class SallaEndpointFailureException(APIException):
-    default_detail = 'Salla Oauth Failed.'
+    default_detail = 'Salla Endpoint not going right.'
     default_code = 'error'
     status_code = status.HTTP_424_FAILED_DEPENDENCY
 
