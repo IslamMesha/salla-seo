@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from app import models
+from app.serializer_custom_fields import SallaSubscriptionPlanDurationField
 
 def PROMPT_TYPES():
     from app import controllers
@@ -52,6 +53,12 @@ class UserPromptSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'user': {'read_only': True},
         }
+
+
+class SallaUserSubscriptionPayloadSerializer(serializers.Serializer):
+    plan_type = serializers.CharField() 
+    plan_name = serializers.CharField()
+    plan_period = SallaSubscriptionPlanDurationField(allow_null=True)
 
 
 class ProductEndpointParamsSerializer(serializers.Serializer):
