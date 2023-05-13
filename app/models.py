@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.utils import timezone
 
 from app import utils
 from app import managers
@@ -283,5 +284,59 @@ class SallaWebhookLog(models.Model):
         emoji = '✅' if status == 'success' else '❌'
         return f'({self.id}) - {emoji} {self.event} - {self.merchant_id}'
 
+
+class SallaUserSubscription(models.Model):
+    user = models.ForeignKey(
+        SallaUser, on_delete=models.CASCADE, related_name='subscriptions'
+    )
+
+    plan_type = models.CharField(max_length=32) # free, once, recurring
+    plan_name = models.CharField(max_length=32)
+    plan_period = models.DurationField(blank=True, null=True) # in months
+
+    payload = models.JSONField(default=dict)
+
+    # permissions
+    gpt_prompts_limit = models.PositiveSmallIntegerField(default=0)
+
+    PRODUCT_TOTAL_PROMPTS = len(CHATGPT_PROMPT_TYPES())
+    PLANS_LIMITS = {
+        'basic': {
+            'gpt_prompts_limit': 15 * PRODUCT_TOTAL_PROMPTS,
+        },
+        'starter': {
+            'gpt_prompts_limit': 30 * PRODUCT_TOTAL_PROMPTS,
+        },
+        'pro': {
+            'gpt_prompts_limit': 100 * PRODUCT_TOTAL_PROMPTS,
+        },
+        'max': {
+            'gpt_prompts_limit': 1000 * PRODUCT_TOTAL_PROMPTS,
+        },
+    }
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs) -> None:
+        self.calculate_limits()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.user}'
+
+    def calculate_limits(self):
+        plan_name = self.plan_name.lower()
+        plan_name = plan_name if plan_name in self.PLANS_LIMITS.keys() else 'basic'
+
+        limits = self.PLANS_LIMITS.get(plan_name)
+        for limit, value in limits.items():
+            setattr(self, limit, value)
+
+    def is_alive(self) -> bool:
+        return (
+            self.plan_period is None or
+            self.created_at + self.plan_period > timezone.now()
+        )
 
 
