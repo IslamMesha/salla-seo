@@ -18,7 +18,9 @@ function getTakeOrLeaveElement(textElement, oldText, prompt_id){
     let { sallaSubmitUrl } = cardElement.dataset;
 
     fetch(sallaSubmitUrl, postMethod({ prompt_id }))
-      .catch((error) => console.error(error))
+      .catch((error) => 
+        iziToast.error({ title: 'Error', message: 'Can\'t save into salla.', position: 'topRight' })
+      )
       .finally(() => elm.remove());
   });
 
@@ -80,7 +82,9 @@ function addEventToSetDescriptionButton(button, textElement) {
         textElement.innerText = new_value;
         closePopup(listDescriptionLogPopup);
       })
-      .catch((error) => console.error(error))
+      .catch((error) => 
+        iziToast.error({ title: 'Error', message: 'Can\'t save into salla.', position: 'topRight' })
+      )
       .finally(() => undo());
   });
 }
@@ -129,7 +133,9 @@ productIcons.forEach((icon) => {
             popup.appendChild(noDescriptionElement);
           }
         })
-        .catch((error) => console.log(error))
+        .catch((error) => 
+          iziToast.error({ title: 'Error', message: 'Can\'t get history.', position: 'topRight' })
+        )
         .finally(() => iconUnloading());
     } else if (isEditAction) {
       const cardElement = getCardElement(icon);
@@ -178,7 +184,9 @@ productIcons.forEach((icon) => {
             getTakeOrLeaveElement(textElement, oldText, prompt_id)
           );
         })
-        .catch((error) => console.error(error))
+        .catch((error) => 
+          iziToast.error({ title: 'Error', message: 'Unexpected error happened.', position: 'topRight' })
+        )
         .finally(() => {
           iconUnloading();
         });
