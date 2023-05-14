@@ -26,6 +26,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <link rel="stylesheet" href="{% static 'css/iziToast.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% if page.md %}
     <link rel="stylesheet" href="{% static 'css/md.css' %}">
@@ -82,9 +83,10 @@
       </div>
     </footer>
 
+    <script src="{% static 'js/iziToast.min.js' %}" type="text/javascript"></script> 
     <script src="{% static 'js/utils.js' %}"></script>
     <script src="{% static 'js/popup.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
-    
+
   </body>
 </html>
