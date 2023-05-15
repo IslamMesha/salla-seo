@@ -118,3 +118,22 @@ main table td {
   padding: 0.5em 1em;
   border: 1px solid #ccc;
 }
+
+
+/* custom */
+
+main {
+  direction: rtl;
+  line-height: 1rem;
+}
+
+h1 {
+  font-size: 32px !important;
+  margin-bottom: 64px !important;
+  margin-top: 40px !important;
+}
+
+h2 {
+  font-size: 24px !important;
+  margin-bottom: 12px !important;
+}
