@@ -4,7 +4,7 @@ function getTakeOrLeaveElement(textElement, oldText, prompt_id){
   // NOTE textElement already has the new text
 
   const elm = createElement(`
-    <div class="prompt-confirmation flex justify-center space-x-2 space-x-reverse mb-4">
+    <div class="prompt-confirmation flex justify-center space-x-2 space-x-reverse mt-2 mb-4">
       <button type="button" class="accept w-6 h-6 text-xs text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none">
         <i class="fas fa-check"></i>
       </button>
@@ -61,6 +61,40 @@ function createDescriptionPopupListItem(description) {
   }
 
   return descriptionElement;
+}
+
+function confirmOrCancelAllPromptsInCardButtons(){
+  const elm = createElement(`
+    <div class="prompt-confirmation-all flex justify-center space-x-2 space-x-reverse mt-2 mb-4">
+      <button type="button" class="accept-all w-6 h-6 text-xs text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none">
+        <i class="fas fa-check"></i>
+      </button>
+      <button type="button" class="cancelled-all w-6 h-6 text-xs text-white bg-red-500 rounded hover:bg-red-600 focus:outline-none">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `);
+
+  elm.querySelector('.accept-all').addEventListener('click', () => {
+    const cardElement = getCardElement(elm);
+
+    cardElement.querySelectorAll('.accept').forEach(button => {
+      button.click();
+    });
+    elm.remove();
+  });
+
+  elm.querySelector('.cancelled-all').addEventListener('click', () => {
+    const cardElement = getCardElement(elm);
+
+    cardElement.querySelectorAll('.cancelled').forEach(button => {
+      button.click();
+    });
+
+    elm.remove();
+  });
+
+  return elm;
 }
 
 function addEventToSetDescriptionButton(button, textElement) {
@@ -218,6 +252,11 @@ productIcons.forEach((icon) => {
         else{
           iconUnloading();
           clearInterval(iconLoadingInterval);
+          setTimeout(() => {
+            if(cardElement.querySelector('.prompt-confirmation')){
+              keywordsElement.appendChild(confirmOrCancelAllPromptsInCardButtons())
+            }
+          }, 200);
         }
 
       }, 200);
