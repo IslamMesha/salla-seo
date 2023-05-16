@@ -1,8 +1,5 @@
 <div class="toggels flex flex-col items-end mt-5">
-  <div
-    id="toggle-processed-cards"
-    class="flex items-center cursor-pointer mt-3"
-  >
+  <div id="toggle-processed-cards" class="flex items-center cursor-pointer mt-3">
     <div class="relative">
       <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
       <div
@@ -10,13 +7,10 @@
         style="top: 50%; transform: translateY(-50%)"
       ></div>
     </div>
-    <p class="ml-3 font-bold text-lg text-gray-600">أخفاء المنتجات المنتهية</p>
+    <p class="ml-3 font-bold text-lg text-gray-600">أخفاء المنتجات المنجزة</p>
   </div>
 
-  <div
-    id="toggle-processed-sections"
-    class="flex items-center cursor-pointer mt-3"
-  >
+  <div id="toggle-processed-sections" class="flex items-center cursor-pointer mt-3">
     <div class="relative">
       <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
       <div
@@ -25,10 +19,32 @@
       ></div>
     </div>
     <p class="ml-3 font-bold text-lg text-gray-600">
-      أخفاء الاجزاء المنتهية علي حدي
+      أخفاء الاجزاء المنجزة علي حدي
     </p>
   </div>
 </div>
+
+<!-- <div class="flex space-x-4 flex-row-reverse mt-10 space-x-2 space-x-reverse">
+  <button
+    id="toggle-processed-cards"
+    class="
+      px-4 py-2 bg-gray-300 text-gray-900 rounded-lg 
+      transition-colors duration-300 text-sm font-semibold
+      hover:bg-gray-400 focus:outline-none focus:bg-gray-400
+    "
+  >أخفاء المنتجات المنجزة</button>
+
+  <button
+    id="toggle-processed-sections"
+    class="
+      act
+      px-4 py-2 bg-gray-300 text-gray-900 rounded-lg 
+      transition-colors duration-300 text-sm font-semibold
+      hover:bg-gray-400 focus:outline-none focus:bg-gray-400
+    "
+  >أخفاء الاجزاء المنجزة علي حدي</button>
+</div> -->
+
 
 <script>
   const toggleProcessedCards = document.getElementById(
@@ -48,7 +64,7 @@
     if (on) {
       circle.classList.remove("right-0");
       toggleProcessedCards.querySelector("p").innerText =
-        "أخفاء المنتجات المنتهية";
+        "أخفاء المنتجات المنجزة";
 
       document
         .querySelectorAll(".product[data-is-fully-processed='true']")
@@ -58,7 +74,7 @@
     } else {
       circle.classList.add("right-0");
       toggleProcessedCards.querySelector("p").innerText =
-        "إظهار المنتجات المنتهية";
+        "إظهار المنتجات المنجزة";
 
       document
         .querySelectorAll(".product[data-is-fully-processed='true']")
@@ -75,7 +91,7 @@
     if (on) {
       circle.classList.remove("right-0");
       toggleProcessedSections.querySelector("p").innerText =
-        "أخفاء الاجزاء المنتهية علي حدي";
+        "أخفاء الاجزاء المنجزة علي حدي";
 
       document.querySelectorAll("[data-is-processed='true']").forEach((elm) => {
         elm.classList.remove("hidden");
@@ -83,7 +99,7 @@
     } else {
       circle.classList.add("right-0");
       toggleProcessedSections.querySelector("p").innerText =
-        "إظهار الاجزاء المنتهية علي حدي";
+        "إظهار الاجزاء المنجزة علي حدي";
 
       document.querySelectorAll("[data-is-processed='true']").forEach((elm) => {
         elm.classList.add("hidden");
