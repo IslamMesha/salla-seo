@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('ask-gpt/', views.AskGPTAboutProductAPI.as_view(), name='ask_gpt'),
     path('salla/submit/', views.SubmitToSallaAPI.as_view(), name='salla_submit'),
+    path('salla/submit/manually/', views.SubmitProductEditManuallyToSallaAPI.as_view(), name='salla_submit_manually'),
     path('prompt/decline/', views.PromptDeclineAPI.as_view(), name='prompt_decline'),
     path('product/history/', views.ProductListHistoryAPI.as_view(), name='product_history'),
 

@@ -168,6 +168,31 @@ class SubmitToSallaAPI(APIView):
         return Response({'new_value': prompt.chat_gpt_response.answer})
 
 
+class SubmitProductEditManuallyToSallaAPI(APIView):
+    post_body_serializer = serializers.ProductUpdateManuallyPOSTBodySerializer
+
+    def get_data(self, request) -> dict:
+        serializer = self.post_body_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+
+        return data
+
+    def post(self, request):
+        data = self.get_data(request)
+        prompt = UserPrompt.objects.create(
+            user=request.user,
+            meta={'is_manually': True, 'new_value': data['new_value']},
+            product_id=data['product_id'],
+            prompt_type=data['prompt_type'],
+            is_accepted=True,
+        )
+        response = prompt.write_to_salla()
+
+        # TODO make use of response
+        return Response({'new_value': data['new_value']})
+
+
 class PromptDeclineAPI(APIView):
     post_body_serializer = serializers.ProductUpdatePOSTBodySerializer
 

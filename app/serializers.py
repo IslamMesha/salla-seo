@@ -123,6 +123,12 @@ class ProductUpdatePOSTBodySerializer(serializers.Serializer):
     prompt_id = serializers.CharField(required=True)
 
 
+class ProductUpdateManuallyPOSTBodySerializer(serializers.Serializer):
+    product_id = serializers.CharField(required=True)
+    prompt_type = serializers.ChoiceField(required=True, choices=PROMPT_TYPES())
+    new_value = serializers.CharField(required=True)
+
+
 class LoginPOSTBodySerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
