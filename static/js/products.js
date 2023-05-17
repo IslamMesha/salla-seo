@@ -97,6 +97,30 @@ function confirmOrCancelAllPromptsInCardButtons(){
   return elm;
 }
 
+function confirmOrCancelEditingTextManuallyButtons(confirmMethod, cancelMethod){
+  const elm = createElement(`
+    <div class="prompt-confirmation-editing flex justify-center space-x-2 space-x-reverse mt-2 mb-2">
+      <button type="button" class="accept-edits w-6 h-6 text-xs text-white bg-green-500 rounded hover:bg-green-600 focus:outline-none">
+        <i class="fas fa-check"></i>
+      </button>
+      <button type="button" class="cancelled-edits w-6 h-6 text-xs text-white bg-red-500 rounded hover:bg-red-600 focus:outline-none">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `);
+
+  elm.querySelector('.accept-edits').addEventListener('click', () => {
+    confirmMethod();
+    elm.remove();
+  });
+  elm.querySelector('.cancelled-edits').addEventListener('click', () => {
+    cancelMethod();
+    elm.remove();
+  });
+
+  return elm;
+}
+
 function addEventToSetDescriptionButton(button, textElement) {
   button.addEventListener("click", () => {
     const undo = buttonToLoading(button);
@@ -127,8 +151,9 @@ productIcons.forEach((icon) => {
   icon.addEventListener("click", () => {
     const isAlreadyClicked = icon.classList.contains("fa-spinner");
     const isListHistory = icon.classList.contains("fa-history");
-    const isEditAction = icon.classList.contains("fa-magic");
+    const isAskGPTAction = icon.classList.contains("fa-magic");
     const isEditAllAction = icon.classList.contains("fa-paper-plane");
+    const isEditAction = icon.classList.contains("fa-edit");
 
     if (isAlreadyClicked)
       return;
@@ -171,11 +196,11 @@ productIcons.forEach((icon) => {
           iziToast.error({ title: 'Error', message: 'Can\'t get history.', position: 'topRight' })
         )
         .finally(() => iconUnloading());
-    } else if (isEditAction) {
+    } else if (isAskGPTAction) {
       const cardElement = getCardElement(icon);
       const keywordsElement = cardElement.querySelector('.keywords-input');
       const keywords = keywordsElement.querySelector('input[type="text"]').value;
-      let { product, editUrl } = cardElement.dataset
+      let { product, askGptUrl } = cardElement.dataset
       const textElement = icon.parentElement.querySelector('p');
       const { promptType } = icon.parentElement.dataset;
       product = JSON.parse(product);
@@ -208,7 +233,7 @@ productIcons.forEach((icon) => {
         keywordsElement.querySelector('input[type="text"]').classList.remove('border-red-500');
       }
 
-      fetch(editUrl, request)
+      fetch(askGptUrl, request)
         .then((response) => response.json())
         .then(({ answer, prompt_id }) => {
           const oldText = textElement.innerText;
@@ -260,6 +285,86 @@ productIcons.forEach((icon) => {
         }
 
       }, 200);
+    } else if (isEditAction) {
+      const cardElement = getCardElement(icon);
+      const textElement = icon.parentElement.querySelector('p');
+      const { promptType } = icon.parentElement.dataset;
+      const oldText = textElement.innerText;
+      const editableElement = createElement(`
+      <div>
+        <textarea class="block border-2 mt-3 px-3 py-2 w-full text-sm">${oldText.replace(/✅$/, '').trim()} </textarea>
+      </div>
+      `);
+
+      textElement.replaceWith(editableElement);
+      editableElement.querySelector('textarea').focus();
+      editableElement.querySelector('textarea').setSelectionRange(oldText.length, oldText.length);
+      editableElement.appendChild(
+        confirmOrCancelEditingTextManuallyButtons(
+          // confirm
+          () => {
+            const newText = editableElement.querySelector('textarea').value;
+            const cardElement = getCardElement(editableElement);
+            let { product, sallaSubmitManuallyUrl } = cardElement.dataset;
+            product = JSON.parse(product);
+            const request = postMethod({
+              product_id: product.id,
+              prompt_type: promptType,
+              new_value: newText.trim(),
+            });
+        
+            fetch(sallaSubmitManuallyUrl, request)
+              .then((response) => response.json())
+              .then(({ new_value }) => {
+                textElement.innerText = new_value;
+                editableElement.replaceWith(textElement);
+              })
+              .catch((error) => 
+                iziToast.error({ title: 'Error', message: 'Can\'t save into salla.', position: 'topRight' })
+              )
+              .finally(() => {
+                iconUnloading();
+              });
+          },
+
+
+          // cancel
+          () => {
+            editableElement.replaceWith(textElement);
+            iconUnloading();
+          }
+        )
+      );
+      
+      // let { product, askGptUrl } = cardElement.dataset
+      // product = JSON.parse(product);
+      // const request = postMethod({
+      //   product_id: product.id,
+      //   // NOTE this may cause issue when user edit the product but not refresh the page
+      //   product_name: product.name,
+      //   product_description: product.description,
+      //   product_seo_title: product.metadata.title,
+      //   brand_name: product.brand,
+      //   // more data
+      //   prompt_type: promptType,
+      // })
+
+      // fetch(askGptUrl, request)
+      //   .then((response) => response.json())
+      //   .then(({ answer, prompt_id }) => {
+      //     const oldText = textElement.innerText;
+
+      //     textElement.innerText = answer;
+      //     icon.parentElement.appendChild(
+      //       getTakeOrLeaveElement(textElement, oldText, prompt_id)
+      //     );
+      //   })
+      //   .catch((error) => 
+      //     iziToast.error({ title: 'Error', message: 'Unexpected error happened.', position: 'topRight' })
+      //   )
+      //   .finally(() => {
+      //     iconUnloading();
+      //   });
     }
 
   });
