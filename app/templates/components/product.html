@@ -6,8 +6,9 @@
   style="min-width: calc(100% / 3 - 16px);"
   data-product="{{ product|to_json }}"
   data-history-url="{% url 'app:product_history' %}"
-  data-edit-url="{% url 'app:ask_gpt' %}"
+  data-ask-gpt-url="{% url 'app:ask_gpt' %}"
   data-salla-submit-url="{% url 'app:salla_submit' %}"
+  data-salla-submit-manually-url="{% url 'app:salla_submit_manually' %}"
   data-prompt-decline-url="{% url 'app:prompt_decline' %}"
   data-is-fully-processed="{{ product.is_fully_processed|boolean|to_json }}"
 >
