@@ -198,9 +198,10 @@ class UserPrompt(models.Model):
     user = models.ForeignKey(
         SallaUser, on_delete=models.CASCADE, related_name='prompts'
     )
-    # rename to chat_gpt_response
+
     chat_gpt_response = models.OneToOneField(
-        'app.ChatGPTResponse', on_delete=models.CASCADE, related_name='user_prompt'
+        'app.ChatGPTResponse', on_delete=models.CASCADE, related_name='user_prompt',
+        blank=True, null=True
     )
     # it may contain data about the product user asked about
     # TODO rename meta to payload
@@ -216,7 +217,9 @@ class UserPrompt(models.Model):
 
     @property
     def acceptance_emoji(self):
-        return {
+        is_manually = self.chat_gpt_response is None
+
+        return '🙋‍♂️' if  is_manually else {
             True: '✅',
             False: '❌',   
         }.get(self.is_accepted, '🤷‍♂️')
