@@ -5,7 +5,8 @@
 
 {% block content %}
     {% if not is_authenticated %}
-    <h1 class="text-4xl font-bold text-center text-capitalize">This is Landing page</h1>
+    {% include 'components/homepage.html' %}
+    
     {% else %}
     {% include 'components/products.html' %}
     {% endif %}
