@@ -30,10 +30,10 @@ def pull_store(sender, instance, created, **kwargs):
         utils.create_by_serializer(SallaStoreSerializer, store_data)
 
 
-@receiver(post_save, sender=models.SallaUser)
+@receiver(post_save, sender=models.Account)
 def pull_subscription_plan(sender, instance, created, **kwargs):
     if created:
-        account = instance.account
+        account = instance
         try:
             payload = SallaAppSettingsReader(account).get_subscription()
         except Exception as e:
@@ -47,6 +47,6 @@ def pull_subscription_plan(sender, instance, created, **kwargs):
         payload_data.is_valid(raise_exception=True)
 
         subscription = models.SallaUserSubscription(
-            user=instance, payload=payload, **payload_data.data,
+            user=account.user, payload=payload, **payload_data.data,
         )
         subscription.save()
