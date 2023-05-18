@@ -44,7 +44,7 @@ function getTakeOrLeaveElement(textElement, oldText, prompt_id){
 
 function createDescriptionPopupListItem(description) {
   const descriptionElement = createElement(`
-        <div class="description-item mb-8 pb-5 border-b-2 border-solid">
+        <div class="description-item mb-8 pb-5 border-b-2 border-solid" data-prompt-id="{{ description.id }}">
             <span>${description.chat_gpt_response.answer}</span>
             <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">أستخدم هذا</button>
         </div>
@@ -126,12 +126,14 @@ function addEventToSetDescriptionButton(button, textElement) {
     const undo = buttonToLoading(button);
     const cardElement = getCardElement(textElement);
     let { product, sallaSubmitUrl } = cardElement.dataset;
+    const { promptId } = button.parentElement.dataset;
 
     product = JSON.parse(product);
     const request = postMethod({
-      product_id: product.id,
-      prompt_type: textElement.parentElement.dataset.promptType,
-      new_value: button.parentElement.querySelector('span').innerText.trim(),
+      // product_id: product.id,
+      // prompt_type: textElement.parentElement.dataset.promptType,
+      // new_value: button.parentElement.querySelector('span').innerText.trim(),
+      prompt_id: promptId,
     });
 
     fetch(sallaSubmitUrl, request)
