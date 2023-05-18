@@ -242,7 +242,12 @@ class UserPrompt(models.Model):
     def write_to_salla(self):
         from app.controllers import SallaWriter
 
-        payload = { self.salla_understandable_key: self.chat_gpt_response.answer }
+        if self.chat_gpt_response:
+            answer = self.chat_gpt_response.answer
+        else:
+            answer = self.meta.get('new_value')
+
+        payload = { self.salla_understandable_key: answer }
         salla_writer = SallaWriter(self.user.account)
         response = salla_writer.product_update(self.product_id, payload)
 
