@@ -141,11 +141,11 @@ class Account(models.Model):
         # update products with prompts count
         products = context['products']
 
-        products_ids = [product['id'] for product in products]
+        products_ids = [str(product['id']) for product in products]
         prompts = UserPrompt.get_products_prompts_report(products_ids)
-        prompts = { prompt['product_id']: prompt for prompt in prompts }
+        prompts = { str(prompt['product_id']): prompt for prompt in prompts }
         for product in products:
-            product_prompts = prompts.get(product['id'], {})
+            product_prompts = prompts.get(str(product['id']), {})
             product['prompts'] = product_prompts
             product['is_fully_processed'] = product_prompts and all(product_prompts.values())
 
