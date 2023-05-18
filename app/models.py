@@ -237,6 +237,8 @@ class UserPrompt(models.Model):
         }.get(self.prompt_type)
 
     def __str__(self):
+        if self.chat_gpt_response is None:
+            return f'[ Manually ] {self.user }: ({self.acceptance_emoji})'
         return f'{self.user }: {self.chat_gpt_response.prompt} ({self.acceptance_emoji})'
 
     def write_to_salla(self):
