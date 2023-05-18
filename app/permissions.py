@@ -1,5 +1,5 @@
 from rest_framework import permissions
-
+from datetime import timedelta
 
 class SallaPlanLimits(permissions.BasePermission):
     message = 'You have reached your plan limits'
@@ -9,7 +9,7 @@ class SallaPlanLimits(permissions.BasePermission):
             subscription = request.user.subscriptions.filter(is_active=True).last()
             if subscription and subscription.is_alive:
                 start_date = subscription.created_at
-                end_date = subscription.created_at + subscription.plan_period
+                end_date = subscription.created_at + (subscription.plan_period or timedelta(days=1000)) 
                 # get prompts count during the subscription month
                 prompts_count = request.user.prompts.filter(
                     created_at__gte=start_date, created_at__lte=end_date
