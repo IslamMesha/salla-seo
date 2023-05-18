@@ -46,15 +46,15 @@ function createDescriptionPopupListItem(description) {
   const descriptionElement = createElement(`
         <div class="description-item mb-8 pb-5 border-b-2 border-solid">
             <span>${description.chat_gpt_response.answer}</span>
-            <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">Set This Description</button>
+            <button class="set-description bg-red-500 hover:bg-red-700 text-white text-sm font-bold px-2 py-1 rounded mt-1">أستخدم هذا</button>
         </div>
     `);
 
-  if (description.meta.keywords_str) {
+  if (description.meta.keywords) {
     descriptionElement.appendChild(
       createElement(`
         <span class="text-gray-500 text-sm block font-bold flex flex-row-reverse mt-3">
-          ${description.meta.keywords_str}
+          ${description.meta.keywords}
         </span>
       `)
     );
