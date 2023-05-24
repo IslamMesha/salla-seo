@@ -201,11 +201,12 @@ class SallaWriter:
 
 
 class ChatGPT:
-    def __init__(self) -> None:
+    def __init__(self, max_tokens:int=None) -> None:
         import openai
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
         self.openai = openai
+        self.max_tokens = max_tokens or int(os.getenv('OPENAI_MAX_TOKEN', 512))
 
     def __log_to_db(self, prompt: str, response: dict) -> ChatGPTResponse:
         from app.serializers import ChatGPTResponseSerializer
@@ -219,13 +220,12 @@ class ChatGPT:
 
     def ask(self, prompt: str) -> ChatGPTResponse:
         openai_model = os.getenv('OPENAI_MODEL', 'text-davinci-003')
-        openai_max_token = int(os.getenv('OPENAI_MAX_TOKEN', 512))
 
         response = self.openai.Completion.create(
             model=openai_model,
             prompt=prompt,
             temperature=0,
-            max_tokens=openai_max_token,
+            max_tokens=self.max_tokens,
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0
