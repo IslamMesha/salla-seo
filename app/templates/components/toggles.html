@@ -7,7 +7,7 @@
         style="top: 50%; transform: translateY(-50%)"
       ></div>
     </div>
-    <p class="ml-3 font-bold text-lg text-gray-600">أخفاء المنتجات المنجزة</p>
+    <p class="ml-3 font-bold text-lg text-gray-600">إخفاء المنتجات المنجزة</p>
   </div>
 
   <div id="toggle-processed-sections" class="flex items-center cursor-pointer mt-3">
@@ -19,7 +19,7 @@
       ></div>
     </div>
     <p class="ml-3 font-bold text-lg text-gray-600">
-      أخفاء الاجزاء المنجزة علي حدي
+      إخفاء الأجزاء المنجزة على حدى
     </p>
   </div>
 </div>
@@ -32,7 +32,7 @@
       transition-colors duration-300 text-sm font-semibold
       hover:bg-gray-400 focus:outline-none focus:bg-gray-400
     "
-  >أخفاء المنتجات المنجزة</button>
+  >إخفاء المنتجات المنجزة</button>
 
   <button
     id="toggle-processed-sections"
@@ -42,7 +42,7 @@
       transition-colors duration-300 text-sm font-semibold
       hover:bg-gray-400 focus:outline-none focus:bg-gray-400
     "
-  >أخفاء الاجزاء المنجزة علي حدي</button>
+  >إخفاء الأجزاء المنجزة على حدى</button>
 </div> -->
 
 
@@ -64,7 +64,7 @@
     if (on) {
       circle.classList.remove("right-0");
       toggleProcessedCards.querySelector("p").innerText =
-        "أخفاء المنتجات المنجزة";
+        "إخفاء المنتجات المنجزة";
 
       document
         .querySelectorAll(".product[data-is-fully-processed='true']")
@@ -91,7 +91,7 @@
     if (on) {
       circle.classList.remove("right-0");
       toggleProcessedSections.querySelector("p").innerText =
-        "أخفاء الاجزاء المنجزة علي حدي";
+        "إخفاء الأجزاء المنجزة على حدى";
 
       document.querySelectorAll("[data-is-processed='true']").forEach((elm) => {
         elm.classList.remove("hidden");
@@ -99,7 +99,7 @@
     } else {
       circle.classList.add("right-0");
       toggleProcessedSections.querySelector("p").innerText =
-        "إظهار الاجزاء المنجزة علي حدي";
+        "إظهار الأجزاء المنجزة على حدى";
 
       document.querySelectorAll("[data-is-processed='true']").forEach((elm) => {
         elm.classList.add("hidden");
