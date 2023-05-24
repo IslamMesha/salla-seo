@@ -135,12 +135,7 @@ function addEventToSetDescriptionButton(button, textElement) {
     const { promptId } = button.parentElement.dataset;
 
     product = JSON.parse(product);
-    const request = postMethod({
-      // product_id: product.id,
-      // prompt_type: textElement.parentElement.dataset.promptType,
-      // new_value: button.parentElement.querySelector('span').innerText.trim(),
-      prompt_id: promptId,
-    });
+    const request = postMethod({ prompt_id: promptId });
 
     fetch(sallaSubmitUrl, request)
       .then((response) => response.json())
@@ -341,36 +336,6 @@ productIcons.forEach((icon) => {
           }
         )
       );
-      
-      // let { product, askGptUrl } = cardElement.dataset
-      // product = JSON.parse(product);
-      // const request = postMethod({
-      //   product_id: product.id,
-      //   // NOTE this may cause issue when user edit the product but not refresh the page
-      //   product_name: product.name,
-      //   product_description: product.description,
-      //   product_seo_title: product.metadata.title,
-      //   brand_name: product.brand,
-      //   // more data
-      //   prompt_type: promptType,
-      // })
-
-      // fetch(askGptUrl, request)
-      //   .then((response) => response.json())
-      //   .then(({ answer, prompt_id }) => {
-      //     const oldText = textElement.innerText;
-
-      //     textElement.innerText = answer;
-      //     icon.parentElement.appendChild(
-      //       getTakeOrLeaveElement(textElement, oldText, prompt_id)
-      //     );
-      //   })
-      //   .catch((error) => 
-      //     iziToast.error({ title: 'Error', message: 'Unexpected error happened.', position: 'topRight' })
-      //   )
-      //   .finally(() => {
-      //     iconUnloading();
-      //   });
     }
 
   });
