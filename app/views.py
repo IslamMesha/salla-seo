@@ -14,7 +14,7 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.permissions import IsAuthenticated
 
 from app.controllers import SallaOAuth, SallaMerchantReader, ChatGPT, ChatGPTProductPromptGenerator, SallaWebhook
-from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
+from app.exceptions import SallaOauthFailedException
 from app.models import Account, UserPrompt, ChatGPTResponse, SallaUser
 from app.utils import set_cookie, validate_email_and_password
 from app.enums import CookieKeys
@@ -275,7 +275,7 @@ class SettingsValidationAPI(APIView):
 
 def exception_handler(exc, context):
     auth_exceptions = (
-        SallaOauthFailedException, SallaEndpointFailureException,
+        SallaOauthFailedException,
         AuthenticationFailed
     )
 
