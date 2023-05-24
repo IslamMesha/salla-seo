@@ -144,8 +144,9 @@ class ChatGPTPromptTemplate(models.Model):
             prompt.name: prompt.template
             for prompt in cls.objects.filter(is_active=True)
         }
-
-        return db_prompts or DEFAULT_PROMPTS
+        # This will override the default prompts with db ones
+        DEFAULT_PROMPTS.update(db_prompts)
+        return DEFAULT_PROMPTS
 
     @classmethod
     def get_template(cls, template_name: str) -> str:
