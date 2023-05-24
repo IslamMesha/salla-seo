@@ -1,4 +1,5 @@
 import os
+import logging
 import requests
 
 from rest_framework.serializers import Serializer
@@ -7,6 +8,9 @@ from app.exceptions import SallaOauthFailedException, SallaEndpointFailureExcept
 from app.models import Account, ChatGPTResponse, SallaUser
 from app import utils
 from app.enums import WebhookEvents
+
+
+logger = logging.getLogger('main')
 
 
 class SallaOAuth:
@@ -78,6 +82,23 @@ class SallaOAuth:
 
         return response.json()
 
+def handel_salla_response_status_code(response, instance):
+    error_message = 'SallaError [{classname}]: ({status_code}) [{url}] {text}'.format(
+        classname=instance.__class__.__name__, url=response.request.url,
+        status_code=response.status_code, text=response.text
+    )
+    if response.status_code < 300:
+        pass # success
+    elif response.status_code == 401:
+        instance.account.access_token = None
+        instance.account.refresh_token = None
+        instance.account.save()
+        logger.error(error_message)
+        raise SallaOauthFailedException()
+    else:
+        logger.error(error_message)
+        raise SallaEndpointFailureException()
+
 
 class SallaBaseReader:
     """Base class for Salla API readers
@@ -114,10 +135,7 @@ class SallaBaseReader:
         url = f'{self.base_url}{endpoint}'
         response = requests.get(url, headers=headers, params=params)
 
-        if response.status_code != 200:
-            print(f'\n\nError: {response.status_code} {response.text}, \n\n')
-            raise SallaEndpointFailureException()
-
+        handel_salla_response_status_code(response, self)
         return self.__get_response_data(response.json())
 
 
@@ -174,10 +192,7 @@ class SallaWriter:
         url = f'{self.base_url}{endpoint}'
         response = requests.put(url, headers=headers, json=body)
 
-        if response.status_code != 201:
-            print(f'\n\nError: {response.status_code} {response.text}, \n\n')
-            raise SallaEndpointFailureException()
-
+        handel_salla_response_status_code(response, self)
         return response.json()['data']
 
     def product_update(self, id: str, body: dict) -> dict:
