@@ -90,3 +90,7 @@ def get_static_products():
         'pagination': json_data['pagination'],
     }
 
+def chars_to_token_calculator(length: int) -> int:
+    """It return a valid token number for chatgpt answer length"""
+    return int(length / 5.5)
+
