@@ -18,6 +18,12 @@ function getTakeOrLeaveElement(textElement, oldText, prompt_id){
     let { sallaSubmitUrl } = cardElement.dataset;
 
     fetch(sallaSubmitUrl, postMethod({ prompt_id }))
+      .then((response) => {
+        textElement.appendChild(
+          createElement(`<span title="Processed" class="cursor-default">✅</span>`)
+        );
+        textElement.parentElement.dataset.isProcessed = true;
+      })
       .catch((error) => 
         iziToast.error({ title: 'Error', message: 'Can\'t save into salla.', position: 'topRight' })
       )
@@ -274,7 +280,7 @@ productIcons.forEach((icon) => {
         const isStillLoading = Array.from(notProcessedElements).filter(magicIcon => {
           return magicIcon.classList.contains('fa-spinner');
         })
-        console.log(isStillLoading)
+
         if (isStillLoading.length > 0) return;
         else{
           iconUnloading();
@@ -328,8 +334,6 @@ productIcons.forEach((icon) => {
                 iconUnloading();
               });
           },
-
-
           // cancel
           () => {
             editableElement.replaceWith(textElement);
