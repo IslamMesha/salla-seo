@@ -263,6 +263,16 @@ class ChatGPTProductPromptGenerator:
         template = self.__get_template().format(**self.data)
         return template
 
+    def get_constraints(self):
+        return {
+            self.Types.SEO_TITLE.value: {
+                'max_tokens': 70,
+            },
+            self.Types.SEO_DESCRIPTION.value: {
+                'max_tokens': 150,
+            }
+        }.get(self._type, {})
+
     @classmethod
     def get_prompt_types(cls) -> list:
         types = [
