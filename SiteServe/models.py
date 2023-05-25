@@ -150,20 +150,6 @@ class ChatGPTPromptTemplate(models.Model):
 
     @classmethod
     def get_template(cls, template_name: str) -> str:
-        # template = cls.get_prompts().get(template_name)
-        # max_chars = None
-        # if template_name.startswith('PRODUCT_SEO_TITLE'):
-        #     max_chars = 70
-        # elif template_name.startswith('PRODUCT_SEO_DESCRIPTION'):
-        #     max_chars = 150
-
-        # if max_chars:
-        #     if template_name.endswith('_EN'):
-        #         prefix = f'In {max_chars} characters or less, '
-        #     else:
-        #         prefix = f'في {max_chars} حرف أو أقل، '
-
-        #     template = prefix + template
         return cls.get_prompts().get(template_name)
 
     def __str__(self):
