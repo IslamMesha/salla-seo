@@ -265,10 +265,10 @@ class ChatGPTProductPromptGenerator:
 
     def get_constraints(self):
         return {
-            self.Types.SEO_TITLE.value: {
+            self.Types.SEO_TITLE: {
                 'max_tokens': 70,
             },
-            self.Types.SEO_DESCRIPTION.value: {
+            self.Types.SEO_DESCRIPTION: {
                 'max_tokens': 150,
             }
         }.get(self._type, {})
