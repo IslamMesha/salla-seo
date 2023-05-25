@@ -127,8 +127,9 @@ class AskGPTAboutProductAPI(APIView):
     def ask_chat_gpt(self, data: dict) -> ChatGPTResponse:
         prompt_generator = ChatGPTProductPromptGenerator(data)
         prompt = prompt_generator.get_prompt()
+        constraints = prompt_generator.get_constraints()
 
-        return ChatGPT().ask(prompt)
+        return ChatGPT(**constraints).ask(prompt)
 
     def post(self, request):
         data = self.get_data(request)
