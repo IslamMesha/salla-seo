@@ -92,5 +92,5 @@ def get_static_products():
 
 def chars_to_token_calculator(length: int) -> int:
     """It return a valid token number for chatgpt answer length"""
-    return int(length / 5.5)
+    return int(length / 5.7)
 
