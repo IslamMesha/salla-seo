@@ -23,6 +23,9 @@ function getTakeOrLeaveElement(textElement, oldText, prompt_id){
           createElement(`<span title="Processed" class="cursor-default">✅</span>`)
         );
         textElement.parentElement.dataset.isProcessed = true;
+        setTimeout(() => 
+          cardElement.dataset.isFullyProcessed = cardElement.querySelectorAll('[data-is-processed="true"]').length === 4
+        , 500)
       })
       .catch((error) => 
         iziToast.error({ title: 'Error', message: 'Can\'t save into salla.', position: 'topRight' })
