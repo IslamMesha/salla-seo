@@ -269,7 +269,7 @@ class ChatGPTProductPromptGenerator:
                 'max_tokens': 70,
             },
             self.Types.SEO_DESCRIPTION: {
-                'max_tokens': 150,
+                'max_tokens': 140,
             }
         }.get(self._type, {})
 
