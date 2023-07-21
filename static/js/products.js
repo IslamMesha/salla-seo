@@ -87,8 +87,8 @@ function confirmOrCancelAllPromptsInCardButtons(){
   elm.querySelector('.accept-all').addEventListener('click', () => {
     const cardElement = getCardElement(elm);
 
-    cardElement.querySelectorAll('.accept').forEach(button => {
-      button.click();
+    cardElement.querySelectorAll('.accept').forEach((button, index) => {
+      setTimeout(() => button.click(), index+1 * 400)
     });
     elm.remove();
   });
