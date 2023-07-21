@@ -1,5 +1,10 @@
+import random
+import string
+
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.conf import settings
+from django.core.mail import send_mail
 
 from app import models
 from app import utils
@@ -28,6 +33,21 @@ def pull_store(sender, instance, created, **kwargs):
         store_data['user'] = instance.user.pk
 
         utils.create_by_serializer(SallaStoreSerializer, store_data)
+
+
+@receiver(post_save, sender=models.Account)
+def send_password_via_email(sender, instance, created, **kwargs):
+    if created:
+        user = instance.user
+        password = ''.join(random.choices(
+            string.ascii_letters+string.digits, k=16))
+
+        user.password = password
+        user.save()
+
+        subject = 'مرحيا بك في تفاصيل'
+        message = f'مرحبا {user.name}, شكرا لتسجيلك معنا. استخدم بريدك الالكتروني المسجل بسلة مع كلمة السر لتسجيل الدخول {password}'
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email, ])
 
 
 @receiver(post_save, sender=models.Account)
