@@ -75,7 +75,7 @@ DATABASES = {
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     # { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
-    { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
     # { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
     # { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
@@ -91,8 +91,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-if IS_LOCAL:= os.getenv('IS_LOCAL', False) == 'True':
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")] #in settings.py
+if IS_LOCAL := os.getenv('IS_LOCAL', False) == 'True':
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # in settings.py
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
@@ -101,7 +101,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Rest Framework
-from rest_framework.authentication import TokenAuthentication
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -110,11 +109,11 @@ REST_FRAMEWORK = {
         # because it can be another type of user
         'rest_framework.permissions.IsAuthenticated'
     ],
-    
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'app.authentication.TokenAuthSupportCookie',
     ],
-    
+
     'EXCEPTION_HANDLER': 'app.views.exception_handler',
 }
 
@@ -136,11 +135,11 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/info.log') ,
+            'filename': os.path.join(BASE_DIR, 'logs/info.log'),
             'formatter': 'main_formatter',
         }
     },
-    
+
     'loggers': {
         'main': {
             'handlers': ['file', 'console'] if DEBUG else ['file'],
@@ -151,3 +150,9 @@ LOGGING = {
 }
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
