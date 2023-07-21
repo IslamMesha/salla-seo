@@ -88,7 +88,7 @@ function confirmOrCancelAllPromptsInCardButtons(){
     const cardElement = getCardElement(elm);
 
     cardElement.querySelectorAll('.accept').forEach((button, index) => {
-      setTimeout(() => button.click(), index+1 * 400)
+      setTimeout(() => button.click(), index * 500)
     });
     elm.remove();
   });
