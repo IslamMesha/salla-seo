@@ -1,5 +1,6 @@
 import os
 import time
+import math
 from typing import List, Tuple
 
 from django.db import models
@@ -303,6 +304,7 @@ class SallaUserSubscription(models.Model):
     plan_type = models.CharField(max_length=32) # free, once, recurring
     plan_name = models.CharField(max_length=32)
     plan_period = models.DurationField(blank=True, null=True) # in months
+    price = models.FloatField(blank=True, null=True)
 
     payload = models.JSONField(default=dict)
 
@@ -312,21 +314,21 @@ class SallaUserSubscription(models.Model):
     # permissions
     gpt_prompts_limit = models.PositiveSmallIntegerField(default=0)
 
-    PRODUCT_TOTAL_PROMPTS = len(CHATGPT_PROMPT_TYPES())
-    PLANS_LIMITS = {
-        'basic': {
-            'gpt_prompts_limit': 15 * PRODUCT_TOTAL_PROMPTS,
-        },
-        'starter': {
-            'gpt_prompts_limit': 30 * PRODUCT_TOTAL_PROMPTS,
-        },
-        'pro': {
-            'gpt_prompts_limit': 100 * PRODUCT_TOTAL_PROMPTS,
-        },
-        'max': {
-            'gpt_prompts_limit': 1000 * PRODUCT_TOTAL_PROMPTS,
-        },
-    }
+    # PRODUCT_TOTAL_PROMPTS = len(CHATGPT_PROMPT_TYPES())
+    # PLANS_LIMITS = {
+    #     'basic': {
+    #         'gpt_prompts_limit': 15 * PRODUCT_TOTAL_PROMPTS,
+    #     },
+    #     'starter': {
+    #         'gpt_prompts_limit': 30 * PRODUCT_TOTAL_PROMPTS,
+    #     },
+    #     'pro': {
+    #         'gpt_prompts_limit': 100 * PRODUCT_TOTAL_PROMPTS,
+    #     },
+    #     'max': {
+    #         'gpt_prompts_limit': 1000 * PRODUCT_TOTAL_PROMPTS,
+    #     },
+    # }
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -339,12 +341,16 @@ class SallaUserSubscription(models.Model):
         return f'{self.user}'
 
     def calculate_limits(self):
-        plan_name = self.plan_name.lower()
-        plan_name = plan_name if plan_name in self.PLANS_LIMITS.keys() else 'basic'
+        prompt_price_ratio = 100/120
+        default_trial = 10
+        price = default_trial if self.price is None else self.price
+        self.gpt_prompts_limit = math.ceil(price * prompt_price_ratio)
+        # plan_name = self.plan_name.lower()
+        # plan_name = plan_name if plan_name in self.PLANS_LIMITS.keys() else 'basic'
 
-        limits = self.PLANS_LIMITS.get(plan_name)
-        for limit, value in limits.items():
-            setattr(self, limit, value)
+        # limits = self.PLANS_LIMITS.get(plan_name)
+        # for limit, value in limits.items():
+        #     setattr(self, limit, value)
 
     def is_alive(self) -> bool:
         return (
