@@ -59,6 +59,7 @@ class SallaUserSubscriptionPayloadSerializer(serializers.Serializer):
     plan_type = serializers.CharField() 
     plan_name = serializers.CharField()
     plan_period = SallaSubscriptionPlanDurationField(allow_null=True)
+    price = serializers.FloatField()
 
     start_date = serializers.DateTimeField(write_only=True, required=False)
     end_date = serializers.DateTimeField(write_only=True, required=False)
