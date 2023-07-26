@@ -3,7 +3,7 @@
 <div
   id="product-{{ forloop.counter }}"
   class="product overflow-hidden shadow-md bg-white w-56 rounded-md overflow-hidden mb-4 flex-shrink-0 flex-grow mx-2 flex flex-col"
-  style="min-width: calc(100% / 3 - 16px);"
+  style="min-width: calc(100% / 3 - 16px); max-width: calc(100% / 3 - 16px);"
   data-product="{{ product|to_json }}"
   data-history-url="{% url 'app:product_history' %}"
   data-ask-gpt-url="{% url 'app:ask_gpt' %}"
