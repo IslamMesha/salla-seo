@@ -347,9 +347,10 @@ class SallaWebhook:
     def __stop_subscriptions(self) -> None:
         payload = self.__get_subscription_payload()
 
-        self.salla_user.subscriptions.filter(
-            plan_name__iexact=payload['plan_name']
-        ).update(is_active=False)
+        # self.salla_user.subscriptions.filter(
+        #     plan_name__iexact=payload['plan_name']
+        # ).update(is_active=False)
+        self.salla_user.subscriptions.all().update(is_active=False)
 
     def __start_subscriptions(self, is_trial: bool = False):
         from app.models import SallaUserSubscription
@@ -375,7 +376,7 @@ class SallaWebhook:
         return {'status': 'success'}
 
     def __subscription_started(self) -> dict:
-        self.__stop_subscriptions()        
+        self.__stop_subscriptions()
         self.__start_subscriptions(is_trial=False)
 
         return {'status': 'success'}
