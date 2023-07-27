@@ -102,7 +102,12 @@ class Account(models.Model):
             instance.token_type = data.get('token_type')
             instance.expires_in = utils.next_two_weeks()
         else:
-            instance = cls(**data)
+            instance = cls(
+                access_token=data.get('access_token'),
+                refresh_token=data.get('refresh_token'),
+                scope=data.get('scope'),
+                token_type=data.get('token_type'),
+            )
 
         instance.save()
         return instance
