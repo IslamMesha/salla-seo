@@ -61,6 +61,7 @@ def pull_subscription_plan(sender, instance, created, **kwargs):
                 'plan_type': 'recurring',
                 'plan_name': 'Free',
                 'plan_period': None,
+                'price': 50
             }
 
         payload_data = SallaUserSubscriptionPayloadSerializer(data=payload)
