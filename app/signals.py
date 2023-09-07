@@ -71,3 +71,21 @@ def pull_subscription_plan(sender, instance, created, **kwargs):
             user=account.user, payload=payload, **payload_data.data,
         )
         subscription.save()
+
+@receiver(post_save, sender=models.UserPrompt)
+def update_plan_balance_is_salla(sender, instance, created, **kwargs):
+    from .controllers import SallaWriter
+    from datetime import timedelta
+
+    if created and instance.chat_gpt_response is not None:
+        subscription = instance.user.subscriptions.filter(is_active=True).last()
+        start_date = subscription.created_at
+        end_date = subscription.created_at + (subscription.plan_period or timedelta(days=1000)) 
+
+        used_prompts = models.UserPrompt.count_for_user(instance.user, start_date, end_date, gpt=True)
+        balance = subscription.gpt_prompts_limit - used_prompts
+        
+        account = instance.user.account
+        SallaWriter(account).balance_update({'balance': balance})
+
+        
