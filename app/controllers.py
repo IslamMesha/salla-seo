@@ -195,9 +195,24 @@ class SallaWriter:
         handel_salla_response_status_code(response, self)
         return response.json()['data']
 
+    def post(self, endpoint: str, body: dict) -> dict:
+        headers = { 
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json',
+        }
+        url = f'{self.base_url}{endpoint}'
+        response = requests.post(url, headers=headers, json=body)
+
+        handel_salla_response_status_code(response, self)
+        return response.json()['data']
+
     def product_update(self, id: str, body: dict) -> dict:
         endpoint = f'/products/{id}'
         return self.put(endpoint, body)
+
+    def balance_update(self, body: dict) -> dict:
+        endpoint = '/apps/balance'
+        return self.post(endpoint, body)
 
 
 class ChatGPT:
