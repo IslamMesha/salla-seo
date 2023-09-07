@@ -242,6 +242,16 @@ class UserPrompt(models.Model):
             ChatGPTProductPromptGenerator.Types.SEO_DESCRIPTION: 'metadata_description',
         }.get(self.prompt_type)
 
+    @classmethod
+    def count_for_user(cls, user, start_date, end_date, gpt=True):
+        lookup = {
+            'user': user, 'created_at__gte': start_date, 'created_at__lte': end_date
+        }
+        if gpt:
+            lookup.update({'chat_gpt_response__isnull': False})
+        qs = cls.objects.filter(**lookup)
+        return qs.count()
+
     def __str__(self):
         if self.chat_gpt_response is None:
             return f'[ Manually ] {self.user }: ({self.acceptance_emoji})'
@@ -349,7 +359,7 @@ class SallaUserSubscription(models.Model):
         prompt_price_ratio = 100/120
         default_trial = 10
         price = default_trial if self.price is None else self.price
-        self.gpt_prompts_limit = math.ceil(price * prompt_price_ratio)
+        self.gpt_prompts_limit = math.ceil(price / prompt_price_ratio)
         # plan_name = self.plan_name.lower()
         # plan_name = plan_name if plan_name in self.PLANS_LIMITS.keys() else 'basic'
 
