@@ -21,7 +21,18 @@ def pull_user(sender, instance, **kwargs):
         user_data = SallaMerchantReader(instance).get_user()
         user_data['salla_id'] = user_data.pop('id')
 
-        user = utils.create_by_serializer(SallaUserSerializer, user_data)
+        # user = utils.create_by_serializer(SallaUserSerializer, user_data)
+        # instance.user = user
+        
+        user = models.SallaUser.objects.filter(salla_id=user_data['salla_id']).first()
+        if user:
+            s = SallaUserSerializer(user, data=user_data)
+        else:
+            s = SallaUserSerializer(data=user_data)
+
+        s.is_valid(raise_exception=True)
+        user = s.save()
+
         instance.user = user
 
 
@@ -32,7 +43,14 @@ def pull_store(sender, instance, created, **kwargs):
         store_data['salla_id'] = store_data.pop('id')
         store_data['user'] = instance.user.pk
 
-        utils.create_by_serializer(SallaStoreSerializer, store_data)
+        store = models.SallaStore.objects.filter(salla_id=store_data['salla_id']).first()
+        if store:
+            s = SallaStoreSerializer(store, data=store_data)
+        else:
+            s = SallaStoreSerializer(data=store_data)
+
+        s.is_valid(raise_exception=True)
+        instance = s.save()
 
 
 @receiver(post_save, sender=models.Account)
@@ -56,6 +74,7 @@ def pull_subscription_plan(sender, instance, created, **kwargs):
         account = instance
         try:
             payload = SallaAppSettingsReader(account).get_subscription()
+            print(payload)
         except Exception as e:
             payload = {
                 'plan_type': 'recurring',

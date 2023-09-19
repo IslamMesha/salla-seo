@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 
 def next_two_weeks():
-    return int(time.time()) + 60 * 60 * 24 * 14
+    return int(time.time()) + 60 * 60 * 24 * 12
 
 def generate_token(length=64):
     space = string.ascii_letters + string.digits

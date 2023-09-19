@@ -95,6 +95,17 @@ class Account(models.Model):
     def store(cls, data, instance=None):
         data.pop('expires_in', None) # its not accurate
 
+        from app.controllers import SallaMerchantReader
+        user_data = SallaMerchantReader(cls(
+                access_token=data.get('access_token'),
+                refresh_token=data.get('refresh_token'),
+                scope=data.get('scope'),
+                token_type=data.get('token_type'),
+            )).get_user()
+        user = SallaUser.objects.filter(salla_id=user_data['id']).first()
+        if user:
+            instance = user.account
+
         if instance:
             instance.access_token = data.get('access_token')
             instance.refresh_token = data.get('refresh_token')

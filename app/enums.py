@@ -17,4 +17,5 @@ class WebhookEvents(Enum):
     SUBSCRIPTION_EXPIRED = 'app.subscription.expired'
     SUBSCRIPTION_CANCELLED = 'app.subscription.canceled'
 
+    APP_UNINSTALLED = 'app.uninstalled'
 

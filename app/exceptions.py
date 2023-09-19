@@ -14,3 +14,8 @@ class SallaEndpointFailureException(APIException):
     default_code = 'error'
     status_code = status.HTTP_424_FAILED_DEPENDENCY
 
+
+class SallaWebhookFailureException(APIException):
+    default_detail = 'Webhook Failure.'
+    default_code = 'error'
+    status_code = status.HTTP_400_BAD_REQUEST

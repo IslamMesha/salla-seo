@@ -61,10 +61,17 @@ class SallaUserSubscriptionPayloadSerializer(serializers.Serializer):
     plan_period = SallaSubscriptionPlanDurationField(allow_null=True)
     price = serializers.FloatField()
 
-    start_date = serializers.DateTimeField(write_only=True, required=False)
-    end_date = serializers.DateTimeField(write_only=True, required=False)
+    start_date = serializers.DateTimeField(write_only=True, allow_null=True, required=False)
+    end_date = serializers.DateTimeField(write_only=True, allow_null=True, required=False)
 
     def validate(self, attrs):
+        from datetime import datetime, timedelta
+
+        if attrs.get('start_date') is None:
+            attrs['start_date'] = datetime.now()
+        if attrs.get('end_date') is None:
+            attrs['end_date'] = datetime.now() + timedelta(days=365*10)
+
         if attrs.get('plan_period') is None and attrs.get('start_date') and attrs.get('end_date'):
             attrs['plan_period'] = attrs['end_date'] - attrs['start_date']
         return super().validate(attrs)

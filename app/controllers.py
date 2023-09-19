@@ -3,8 +3,9 @@ import logging
 import requests
 
 from rest_framework.serializers import Serializer
+from rest_framework.exceptions import ValidationError
 
-from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException
+from app.exceptions import SallaOauthFailedException, SallaEndpointFailureException, SallaWebhookFailureException
 from app.models import Account, ChatGPTResponse, SallaUser
 from app import utils
 from app.enums import WebhookEvents
@@ -306,6 +307,7 @@ class ChatGPTProductPromptGenerator:
         SEO_DESCRIPTION = 'seo_description'
 
 
+
 class SallaWebhook:
     def __init__(self, payload: dict) -> None:
         self.event = payload['event']
@@ -323,13 +325,19 @@ class SallaWebhook:
             WebhookEvents.SUBSCRIPTION_STARTED.value: self.__subscription_started,
             WebhookEvents.SUBSCRIPTION_EXPIRED.value: self.__subscription_expired,
             WebhookEvents.SUBSCRIPTION_CANCELLED.value: self.__subscription_cancelled,
+
+            WebhookEvents.APP_UNINSTALLED.value: self.__subscription_cancelled,
         }.get(self.event)
 
-        assert self.event_handler is not None, f'Event `{self.event}` not found.'
+        if self.event_handler is None:
+            raise  SallaWebhookFailureException(f'Event {self.event} not found.')
 
     def __get_salla_user(self) -> Account:
         # return SallaUser.objects.filter(merchant__id=self.merchant_id).first()
-        return SallaUser.objects.filter(store__salla_id=self.merchant_id).first()
+        user = SallaUser.objects.filter(store__salla_id=self.merchant_id).first()
+        if user is None:
+            raise SallaWebhookFailureException('User not found')
+        return user
 
     def __authorized(self) -> dict:
         Account.store(self.data)
@@ -420,6 +428,9 @@ class SallaWebhook:
         try:
             self.__setup()
             response = self.event_handler()
+            status_code = 200
+        except SallaWebhookFailureException as e:
+            response = {'status': str(e)}
             status_code = 200
         except Exception as e:
             response = {'status': 'error', 'message': str(e)}
