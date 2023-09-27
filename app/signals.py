@@ -64,7 +64,24 @@ def send_password_via_email(sender, instance, created, **kwargs):
         user.save()
 
         subject = 'مرحيا بك في تفاصيل'
-        message = f'مرحبا {user.name}, شكرا لتسجيلك معنا. استخدم بريدك الالكتروني المسجل بسلة مع كلمة السر لتسجيل الدخول {password}'
+        message = (
+            f'مرحبًا {user.name},\n\n'
+
+            'مرحبًا في تطبيق "تفاصيل"! إليك تسجيل الدخول:\n'
+            f'- اسم المستخدم: {user.email}\n'
+            f'- كلمة المرور: {user.password}\n\n'
+            
+            'استخدمهما للوصول إلى تطبيق "تفاصيل".\n'
+            'للمساعدة، اتصل بفريق الدعم.\n\n'
+            
+            'نتمنى لك تجربة ممتعة!\n\n'
+            
+            'https://tafaseel.io/\n\n'
+            
+            'مع أطيب التحيات،\n'
+            '"تفاصيل"\n'
+            '---'
+        )
         send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email, ])
 
 
