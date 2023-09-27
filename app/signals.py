@@ -63,7 +63,7 @@ def send_password_via_email(sender, instance, created, **kwargs):
         user.password = password
         user.save()
 
-        subject = 'مرحيا بك في تفاصيل'
+        subject = 'مرحبا بك في تفاصيل'
         message = (
             f'مرحبًا {user.name},\n\n'
 
