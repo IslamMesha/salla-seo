@@ -156,3 +156,11 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+
+
+# Celery configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Replace with your Redis server address if needed
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Replace with your Redis server address if needed
+CELERY_TIMEZONE = 'UTC'  # Use your preferred timezone
+
