@@ -6,6 +6,8 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.core.mail import send_mail
 
+from rest_framework.exceptions import ValidationError
+
 from app import models
 from app import utils
 from app.controllers import SallaMerchantReader, SallaAppSettingsReader
@@ -89,16 +91,15 @@ def send_password_via_email(sender, instance, created, **kwargs):
 def pull_subscription_plan(sender, instance, created, **kwargs):
     if created:
         account = instance
-        try:
-            payload = SallaAppSettingsReader(account).get_subscription()
-            print(payload)
-        except Exception as e:
-            payload = {
-                'plan_type': 'recurring',
-                'plan_name': 'Free',
-                'plan_period': None,
-                'price': 50
-            }
+
+        subscription_response = SallaAppSettingsReader(account).get_subscription()
+        payload = subscription_response.get('data')
+        print(payload)
+
+        if payload and type(payload) is list:
+            payload = payload[0]
+        else:
+            raise ValidationError('Invalid subscripion')
 
         payload_data = SallaUserSubscriptionPayloadSerializer(data=payload)
         payload_data.is_valid(raise_exception=True)
