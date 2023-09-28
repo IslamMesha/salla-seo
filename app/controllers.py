@@ -335,7 +335,7 @@ class SallaWebhook:
     def __get_salla_user(self) -> Account:
         # return SallaUser.objects.filter(merchant__id=self.merchant_id).first()
         user = SallaUser.objects.filter(store__salla_id=self.merchant_id).first()
-        if user is None:
+        if user is None and self.event != WebhookEvents.AUTHORIZED.value:
             raise SallaWebhookFailureException('User not found')
         return user
 
