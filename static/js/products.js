@@ -216,7 +216,7 @@ productIcons.forEach((icon) => {
         product_name: product.name,
         product_description: product.description,
         product_seo_title: product.metadata.title,
-        brand_name: product.brand,
+        brand_name: product.brand || null ,
         // more data
         keywords: keywords.trim(),
         prompt_type: promptType,
