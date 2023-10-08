@@ -41,6 +41,11 @@ class Index(APIView):
         if request.user.is_authenticated and hasattr(request.user, 'account'):
             context = request.user.account.get_homepage_context(request.GET)
 
+        # import json
+        # with open('./debug/3-products-list.json', 'r') as f:
+        #     context = json.loads(f.read())
+        #     context['products'] = context.pop('data')
+
         return Response(context, template_name='index.html')
 
 
