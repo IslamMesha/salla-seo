@@ -25,4 +25,7 @@ def plus(number):
 def boolean(x):
     return bool(x)
 
+@register.filter 
+def rng(x):
+    return range(1, x+1)
 
