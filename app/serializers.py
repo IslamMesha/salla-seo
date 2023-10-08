@@ -102,7 +102,7 @@ class ChatGPTResponseSerializer(serializers.Serializer):
     full_response = serializers.DictField(source='*', read_only=True)
 
     def get_answer(self, obj):
-        return obj['choices'][0]['text'].strip()
+        return obj['choices'][0]['text'].strip().strip('"')
 
     def save(self, **kwargs):
         return models.ChatGPTResponse.objects.create(**self.data)
