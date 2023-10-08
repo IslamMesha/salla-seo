@@ -1,35 +1,16 @@
 {% load custom_filters %}
 
 <nav class="bg-gray-100 px-4 py-3 flex items-center justify-center">
-  <ul class="flex space-x-2">
-    {% if pagination.currentPage > 1 %}
-    <li>
-      <a
-        href="/?page={{ pagination.currentPage|minus }}"
-        class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded"
-      >
-        {{ pagination.currentPage|minus }}
-      </a>
+  <ul class="flex flex-wrap">
+    
+    {% for page in pagination.totalPages|rng %}
+    <li class="
+      bg-gray-300 hover:bg-gray-400 rounded mb-2 w-10 mr-2 text-center
+      {% if page == pagination.currentPage %}current-page{% endif %}
+    ">
+      <a class="w-full h-full px-2 py-1 inline-block" href="/?page={{ page }}">{{ page }}</a>
     </li>
-    {% endif %}
+    {% endfor %}
 
-    <li>
-      <a
-        href="/?page={{ pagination.currentPage }}"
-        class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded current-page"
-      >
-        {{ pagination.currentPage }}
-      </a>
-    </li>
-    {% if pagination.currentPage < pagination.totalPages %}
-    <li>
-      <a
-        href="/?page={{ pagination.currentPage|plus }}"
-        class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded"
-      >
-        {{ pagination.currentPage|plus }}
-      </a>
-    </li>
-    {% endif %}
   </ul>
 </nav>
