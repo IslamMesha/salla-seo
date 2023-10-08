@@ -215,7 +215,7 @@ productIcons.forEach((icon) => {
         // NOTE this may cause issue when user edit the product but not refresh the page
         product_name: product.name,
         product_description: product.description,
-        product_seo_title: product.metadata.title,
+        product_seo_title: product.metadata.title || null,
         // brand_name: product.brand || null ,
         // more data
         keywords: keywords.trim(),
