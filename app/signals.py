@@ -94,7 +94,6 @@ def pull_subscription_plan(sender, instance, created, **kwargs):
 
         subscription_response = SallaAppSettingsReader(account).get_subscription()
         payload = subscription_response.get('data')
-        print(payload)
 
         if payload and type(payload) is list:
             payload = payload[0]
