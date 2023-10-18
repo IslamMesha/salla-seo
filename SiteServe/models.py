@@ -28,7 +28,7 @@ def ALLOWED_TEMPLATE_LABELS():
         '{product_description}',
         '{product_seo_title}',
         '{keywords}',
-        '{brand_name}',
+        # '{brand_name}',
     ]
     return readable_list(labels, 'or')
 
