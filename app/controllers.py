@@ -380,7 +380,7 @@ class SallaWebhook:
 
         payload = self.__get_subscription_payload()
         subscription = SallaUserSubscription(
-            salla_user=self.salla_user,
+            user=self.salla_user,
             payload=self.data,
             is_trial=is_trial,
             **payload
